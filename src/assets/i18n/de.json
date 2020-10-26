@@ -1,10 +1,18 @@
 {
     "common": {
-        "next": "weiter"
+        "next": "weiter",
+        "back": "zurück"
     },
     "launcher": {
         "home": {
-            "description": "Wenn du selbst eine neue Party erstellen möchtest, klicke \"erstellen\". Wenn du einer bestehenden Party beitreten möchtest, klicke \"beitreten\"."
+            "label": "Bitte gebe deinen Nicknamen ein",
+            "placeholder": "Nickname"
+        },
+        "createorjoin": {
+            "label": "Bitte gebe einen Party-Namen ein",
+            "placeholder": "Party-Name",
+            "create": "erstellen",
+            "join": "beitreten"
         }
     }
 }

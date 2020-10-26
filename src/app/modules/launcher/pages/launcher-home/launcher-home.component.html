@@ -1,3 +1,6 @@
 <h1>Souper Party</h1>
 
-<p>{{ 'launcher.home.description' | translate }}</p>
+<label>{{ 'launcher.home.label' | translate }}</label>
+<input type="text" [placeholder]="'launcher.home.placeholder' | translate">
+
+<button routerLink="createorjoin">{{ 'common.next' | translate }}</button>
