@@ -1,0 +1,10 @@
+{
+    "common": {
+        "next": "weiter"
+    },
+    "launcher": {
+        "home": {
+            "description": "Wenn du selbst eine neue Party erstellen möchtest, klicke \"erstellen\". Wenn du einer bestehenden Party beitreten möchtest, klicke \"beitreten\"."
+        }
+    }
+}
