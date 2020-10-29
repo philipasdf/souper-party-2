@@ -8,6 +8,10 @@ import { LobbyRoutingModule } from './modules/lobby/lobby-routing.module';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { appReducers } from './app.reducer';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -36,6 +40,13 @@ export function HttpLoaderFactory(http: HttpClient) {
       },
       defaultLanguage: 'de'
     }),
+
+    // redux with ngrx
+    EffectsModule.forRoot([]),
+    StoreModule.forRoot(appReducers),
+    StoreDevtoolsModule.instrument({
+      maxAge: 25
+    })
   ],
   providers: [],
   bootstrap: [AppComponent]

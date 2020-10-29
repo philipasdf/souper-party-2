@@ -3,11 +3,31 @@
 Open Souper Party in your browser: https://souper-party.web.app/
 
 ## local installation
-* install npm
-* install angular cli
-* install firebase tools
+install node
+```
+npm i -g @angular/cli
+npm i -g firebase-tools
+```
+
+create environment files
+src/environments/environment.ts
+src/environments/environment.prod.ts
+```
+export const environment = {
+    production: ...,
+    firebase: {
+        apiKey: ...,
+        authDomain: ...,
+        databaseURL: ...,
+        projectId: ...,
+        storageBucket: ...
+    }
+}
+```
+
 
 ## Development server
+
 ```
 npm start
 ```

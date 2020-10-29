@@ -1,6 +1,6 @@
 <h1>Souper Party</h1>
 
 <label>{{ 'launcher.home.label' | translate }}</label>
-<input type="text" [placeholder]="'launcher.home.placeholder' | translate">
+<input type="text" [placeholder]="'launcher.home.placeholder' | translate" [(ngModel)]="nameInput">
 
-<button routerLink="createorjoin">{{ 'common.next' | translate }}</button>
+<button routerLink="createorjoin" (click)="saveUser()">{{ 'common.next' | translate }}</button>

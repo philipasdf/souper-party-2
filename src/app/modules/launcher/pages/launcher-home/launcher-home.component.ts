@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import * as playerReducer from 'src/app/shared/reducers/player.reducer';
+import * as playerActions from 'src/app/shared/actions/player.actions';
+import { Player } from 'src/app/shared/models/player.model';
 
 @Component({
   selector: 'app-launcher-home',
@@ -7,9 +11,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LauncherHomeComponent implements OnInit {
 
-  constructor() { }
+  nameInput: string;
 
-  ngOnInit(): void {
+  constructor(private playerStore: Store<playerReducer.State>) {
+
+
   }
 
+  ngOnInit(): void {
+    this.playerStore.select(playerReducer.selectCurrPlayer).subscribe(currPlayer => {
+      this.nameInput = currPlayer;
+    });
+  }
+
+  saveUser() {
+    this.playerStore.dispatch(playerActions.saveCurrPlayer({ currPlayer: this.nameInput.trim() }));
+  }
 }
