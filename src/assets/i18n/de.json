@@ -14,5 +14,18 @@
             "create": "erstellen",
             "join": "beitreten"
         }
+    },
+    "success": {
+        "party": {
+            "created": "Party erfolgreich erstellt"
+        }
+    },
+    "error": {
+        "party": {
+            "alreadyExists": "Party existiert bereits",
+            "doesNotExists": "Party existiert nicht",
+            "createProcessFailed": "Party konnte nicht erstellt werden",
+            "createDocumentFailed": "Party nicht gespeichert werden"
+        }
     }
 }
