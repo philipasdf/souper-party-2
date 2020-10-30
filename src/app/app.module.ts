@@ -12,6 +12,12 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { appReducers } from './app.reducer';
+import { PlayerEffects } from './shared/effects/player.effects';
+import { PartyEffects } from './shared/effects/party.effects';
+import { AngularFirestoreModule } from "@angular/fire/firestore";
+import { environment } from 'src/environments/environment';
+import { AngularFireModule } from '@angular/fire';
+import { AngularFireStorageModule, BUCKET } from '@angular/fire/storage';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -42,13 +48,23 @@ export function HttpLoaderFactory(http: HttpClient) {
     }),
 
     // redux with ngrx
-    EffectsModule.forRoot([]),
+    EffectsModule.forRoot([
+      PlayerEffects,
+      PartyEffects
+    ]),
     StoreModule.forRoot(appReducers),
     StoreDevtoolsModule.instrument({
       maxAge: 25
-    })
+    }),
+
+    // firebase, firestore
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule.enablePersistence(),
+    AngularFireStorageModule
   ],
-  providers: [],
+  providers: [
+    { provide: BUCKET, useValue: environment.firebase.storageBucket }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

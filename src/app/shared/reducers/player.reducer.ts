@@ -20,7 +20,6 @@ const reducer = createReducer(
 );
 
 export function playerReducer(state: State | undefined, action: Action) {
-    console.log(action.type, state);
     return reducer(state, action);
 }
         

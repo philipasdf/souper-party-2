@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as playerReducer from 'src/app/shared/reducers/player.reducer';
 import * as playerActions from 'src/app/shared/actions/player.actions';
-import { Player } from 'src/app/shared/models/player.model';
 
 @Component({
   selector: 'app-launcher-home',
