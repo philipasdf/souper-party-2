@@ -10,7 +10,7 @@ import * as playerActions from 'src/app/shared/actions/player.actions';
 })
 export class LauncherHomeComponent implements OnInit {
 
-  nameInput: string;
+  nameInput = '';
 
   constructor(private playerStore: Store<playerReducer.State>) {
 

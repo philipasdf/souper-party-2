@@ -3,13 +3,14 @@ import { Party } from '../models/party.model';
 import * as partyActions from '../actions/party.actions';
 
 const initialState: Party = {
+    host: '',
     name: ''
 }
 
 const reducer = createReducer(
     initialState,
-    on(partyActions.createParty, (state, { name }) => { 
-        return { ...state, name };
+    on(partyActions.updateParty, (state, action) => { 
+        return action.party;
     }),
     on(partyActions.joinPartyIfExists, (state, { name }) => { 
         return { ...state, name };

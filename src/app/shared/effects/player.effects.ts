@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { from, Observable, of } from 'rxjs';
-import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, SUCCESS } from '../actions/player.actions';
+import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, JOIN_PARTY_SUCCESS, SUCCESS } from '../actions/player.actions';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { CURR_PLAYER_KEY } from '../local-storage-keys';
 import { AngularFirestore } from '@angular/fire/firestore';
@@ -10,6 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Party } from '../models/party.model';
 import { PARTY_PATH, PLAYER_PATH } from './firestore-paths';
 import { FAILED } from '../actions/party.actions';
+import { Player } from '../models/player.model';
 
 @Injectable()
 export class PlayerEffects {
@@ -41,7 +42,11 @@ export class PlayerEffects {
                             const errorMessage = this.translate.instant('error.player.alreadyExists', { partyName: action.party, nickname: action.player });
                             return ({ type: FAILED, errorMessage });
                         } else {
-                            return ({ type: CREATE_PLAYER, party: action.party, player: action.player });
+                            const player: Player = {
+                                fireId: this.afs.createId(),
+                                name: action.player
+                            }    
+                            return ({ type: CREATE_PLAYER, party: action.party, player });
                         }
                     })
                 )
@@ -53,12 +58,12 @@ export class PlayerEffects {
     createPlayer$: Observable<Action> = this.actions$.pipe(
         ofType(CREATE_PLAYER),
         switchMap((action: any) => {
-            return from(this.afs.doc(`${PARTY_PATH}/${action.party}/${PLAYER_PATH}/${action.player}`)
-                    .set({ name: action.player }))
+            return from(this.afs.doc(`${PARTY_PATH}/${action.party}/${PLAYER_PATH}/${action.player.name}`)
+                    .set(action.player))
                     .pipe(
                         map(() => {
                             const successMessage = this.translate.instant('success.player.created', { name: action.player });
-                            return ({ type: SUCCESS, successMessage });
+                            return ({ type: JOIN_PARTY_SUCCESS, successMessage, partyName: action.party, playerFireId: action.player.fireId });
                         })
                     );
         }),

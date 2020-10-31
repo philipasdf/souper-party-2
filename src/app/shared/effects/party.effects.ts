@@ -5,7 +5,7 @@ import { Action, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { from, Observable, of } from 'rxjs';
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
-import { CREATE_PARTY, CREATE_PARTY_IF_NOT_ALREADY_EXISTS, FAILED, joinPartyIfExists, JOIN_PARTY_IF_EXISTS, SUCCESS } from '../actions/party.actions';
+import { CREATE_PARTY, CREATE_PARTY_IF_NOT_ALREADY_EXISTS, FAILED, joinPartyIfExists, JOIN_PARTY_IF_EXISTS, QUERY_PARTY, SUCCESS, UPDATE_PARTY } from '../actions/party.actions';
 import { CREATE_PLAYER_IF_NOT_ALREADY_EXISTS } from '../actions/player.actions';
 import { Party } from '../models/party.model';
 import { selectCurrPlayer } from '../reducers/player.reducer';
@@ -44,9 +44,14 @@ export class PartyEffects {
     @Effect()
     createParty$: Observable<Action> = this.actions$.pipe(
         ofType(CREATE_PARTY),
-        switchMap((action: any) => {
+        withLatestFrom(this.store.select(selectCurrPlayer)),
+        switchMap(([action, currPlayer]: [any, string]) => {
             const partyName = action.name;
-            return from(this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).set({ name: partyName}))
+            const party: Party = {
+                name: partyName,
+                host: currPlayer
+            }
+            return from(this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).set(party))
                     .pipe(
                         map(() => {
                             const successMessage = this.translate.instant('success.party.created', { name: partyName });
@@ -78,4 +83,14 @@ export class PartyEffects {
                 )
         })
     );
+
+    @Effect()
+    query$ = this.actions$.pipe(
+        ofType(QUERY_PARTY),
+        switchMap((action: any) => this.afs.doc(`${PARTY_PATH}/${action.name}`).valueChanges()),
+        map((doc: Party) => {
+            return ({ type: UPDATE_PARTY, party: doc });
+        })
+
+    )
 }

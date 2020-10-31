@@ -5,5 +5,5 @@
 <p class="error" *ngIf="errorMessage">{{errorMessage}}</p>
 
 <button routerLink="/launcher">{{ 'common.back' | translate }}</button>
-<button (click)="create()">{{ 'launcher.createorjoin.create' | translate }}</button>
-<button (click)="join()">{{ 'launcher.createorjoin.join' | translate }}</button>
+<button (click)="create()" [disabled]="partyNameInput.trim().length === 0">{{ 'launcher.createorjoin.create' | translate }}</button>
+<button (click)="join()" [disabled]="partyNameInput.trim().length === 0">{{ 'launcher.createorjoin.join' | translate }}</button>
