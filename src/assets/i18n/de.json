@@ -17,15 +17,22 @@
     },
     "success": {
         "party": {
-            "created": "Party erfolgreich erstellt"
+            "created": "Party \"{{ name }}\" erfolgreich erstellt"
+        },
+        "player": {
+            "created": "Spieler '{{ name }}' ist der Party erfolgreich beigetreten"
         }
     },
     "error": {
         "party": {
-            "alreadyExists": "Party existiert bereits",
-            "doesNotExists": "Party existiert nicht",
+            "alreadyExists": "Party \"{{ name }}\" existiert bereits",
+            "doesNotExists": "Party \"{{ name }}\" existiert nicht",
             "createProcessFailed": "Party konnte nicht erstellt werden",
             "createDocumentFailed": "Party nicht gespeichert werden"
+        },
+        "player": {
+            "alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",
+            "joinPartyFailed": "Party konnte nicht beigetreten werden"
         }
     }
 }

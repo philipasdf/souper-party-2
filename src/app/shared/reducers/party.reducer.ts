@@ -11,6 +11,9 @@ const reducer = createReducer(
     on(partyActions.createParty, (state, { name }) => { 
         return { ...state, name };
     }),
+    on(partyActions.joinPartyIfExists, (state, { name }) => { 
+        return { ...state, name };
+    }),
     on(partyActions.failed, (state, { errorMessage }) => { 
         console.error(errorMessage, state);
         return { ...state };
@@ -18,7 +21,8 @@ const reducer = createReducer(
 );
 
 export function partyReducer(state: Party | undefined, action: Action) {
-    console.log(action.type, state);
+    console.log(`${action.type} state`, state);
+    console.log(`${action.type} payload`, action);
     return reducer(state, action);
 }
 

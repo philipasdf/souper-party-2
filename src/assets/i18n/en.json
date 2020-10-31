@@ -17,15 +17,22 @@
     },
     "success": {
         "party": {
-            "created": "party successfully created"
+            "created": "party '{{ name }}'  successfully created"
+        },
+        "player": {
+            "created": "player '{{ name }}' successfully joined party"
         }
     },
     "errors": {
         "party": {
-            "alreadyExists": "party already exists",
-            "doesNotExists": "party does not exist",
+            "alreadyExists": "party '{{ name }}' already exists",
+            "doesNotExists": "party '{{ name }}' does not exist",
             "createProcessFailed": "create party process failed",
             "createDocumentFailed": "failed to save party"
+        },
+        "player": {
+            "alreadyExists": "player '{{ nickname }}' already exists in the party '{{ partyName }}'. Please go back and choose another nickname.",
+            "joinPartyFailed": "failed to join party"
         }
     }
 }

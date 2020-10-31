@@ -11,7 +11,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import { appReducers } from './app.reducer';
+import { appReducers } from './shared/reducers/app.reducer';
 import { PlayerEffects } from './shared/effects/player.effects';
 import { PartyEffects } from './shared/effects/party.effects';
 import { AngularFirestoreModule } from "@angular/fire/firestore";
