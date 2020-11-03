@@ -1,3 +1,4 @@
 <h1>{{partyName}}</h1>
 
 <div *ngIf="party$ | async as party">{{party | json }}</div>
+<div *ngIf="players$ | async as players">{{players | json }}</div>

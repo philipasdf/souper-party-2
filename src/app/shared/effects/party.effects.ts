@@ -91,6 +91,5 @@ export class PartyEffects {
         map((doc: Party) => {
             return ({ type: UPDATE_PARTY, party: doc });
         })
-
     )
 }

@@ -1,4 +1,5 @@
 export interface Player {
-    fireId: string;
+    id: string;
     name: string;
+    fireId: string;
 }

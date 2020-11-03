@@ -16,7 +16,8 @@ const reducer = createReducer(
     initialState,
     on(playerActions.saveCurrPlayer, (state, { currPlayer }) => {
         return { ...state, currPlayer }
-    })
+    }),
+    on(playerActions.updatePlayers, (state, { players }) => adapter.setAll(players, state))
 );
 
 export function playerReducer(state: State | undefined, action: Action) {
