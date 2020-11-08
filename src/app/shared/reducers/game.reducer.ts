@@ -9,16 +9,7 @@ export const initialState = adapter.getInitialState();
 
 const reducer = createReducer(
     initialState,
-    on(gameActions.createGame, (state, action) => {
-        const game: Game = {
-            id: action.gameData.name,
-            index: state.ids.length,
-            state: 'initial-state',
-            gameData: action.gameData,
-        }
-
-        return adapter.addOne(game, state);
-    })
+    on(gameActions.createGame, (state, action) => adapter.addOne(action.game, state))
 );
 
 export function gameReducer(state: State | undefined, action: Action) {

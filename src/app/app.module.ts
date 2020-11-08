@@ -20,6 +20,7 @@ import { AngularFireModule } from '@angular/fire';
 import { AngularFireStorageModule, BUCKET } from '@angular/fire/storage';
 import { LobbyModule } from './modules/lobby/lobby.module';
 import { GamesRoutingModule } from './modules/games/games-routing.module';
+import { GameEffects } from './shared/effects/game.effects';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -53,7 +54,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     // redux with ngrx
     EffectsModule.forRoot([
       PlayerEffects,
-      PartyEffects
+      PartyEffects,
+      GameEffects
     ]),
     StoreModule.forRoot(appReducers),
     StoreDevtoolsModule.instrument({

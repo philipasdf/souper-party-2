@@ -12,17 +12,20 @@ export class GameService {
 
     }
 
-    loadGamePreparer(partyName: string, hostFireId: string, gameName: string) {
-        this.router.navigate([`${gameName}/prepare-data/${partyName}/${hostFireId}`]);
+    loadGamePreparer(partyName: string, hostFireId: string, gameName: string, gameIndex: number) {
+        this.router.navigate([`${gameName}/prepare-data/${partyName}/${hostFireId}/${gameIndex}`]);
     }
 
-    createGame(partyName: string, hostFireId: string, gameData: GameData) {
+    createGame(partyName: string, gameData: GameData, index: number) {
 
-        this.store.dispatch(createGame({ gameData }));
-        // dispatch store game action
-        // dispatch store set all players state action
+        const game: Game = {
+            id: gameData.name,
+            index: index,
+            state: 'initial-state',
+            gameData: gameData
+        }
 
-        // this.router.navigate([`lobby/${partyName}/${hostFireId}`])
+        this.store.dispatch(createGame({ game, partyName }));
     }
 
 }

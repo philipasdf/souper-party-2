@@ -1,4 +1,4 @@
-export interface GameData {
+export interface GameData<T> {
     name: string;
-    data?: any;
+    data?: T;
 }

@@ -12,6 +12,7 @@
     "lobby.home.newGame": "New Game",
     "success.party.created": "party '{{ name }}'  successfully created",
     "success.player.created": "player '{{ name }}' successfully joined party",
+    "success.game.created": "game with id '{{ id }}' successfully created",
     "error.party.alreadyExists": "party '{{ name }}' already exists",
     "error.party.doesNotExists": "party '{{ name }}' does not exist",
     "error.party.createProcessFailed": "create party process failed",

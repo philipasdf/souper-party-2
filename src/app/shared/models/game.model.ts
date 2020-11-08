@@ -4,5 +4,5 @@ export interface Game {
     id: string;
     index: number;
     state: string;
-    gameData: GameData;
+    gameData: GameData<any>;
 }

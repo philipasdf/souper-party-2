@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Action, Store } from '@ngrx/store';
+import { Action } from '@ngrx/store';
 import { from, Observable, of } from 'rxjs';
 import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, JOIN_PARTY_SUCCESS, SUCCESS, QUERY_PLAYERS, UPDATE_PLAYERS } from '../actions/player.actions';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { CURR_PLAYER_KEY } from '../local-storage-keys';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { TranslateService } from '@ngx-translate/core';
-import { Party } from '../models/party.model';
 import { PARTY_PATH, PLAYER_PATH } from './firestore-paths';
 import { FAILED } from '../actions/party.actions';
 import { Player } from '../models/player.model';
@@ -17,7 +16,6 @@ export class PlayerEffects {
 
         
     constructor(private actions$: Actions, 
-        private store: Store<Party>, 
         private afs: AngularFirestore, 
         private translate: TranslateService) {}
 

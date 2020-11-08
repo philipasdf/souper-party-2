@@ -63,6 +63,8 @@ export class LobbyHomeComponent implements OnInit, OnDestroy {
     // service.createGameWithData
     // store.dispatch(navigatePlayersToGameGuidePage(game))
     // update all players ({state: 'read-game-guide-and-check-in-game'})
-    this.gameService.loadGamePreparer(this.partyName, this.playerFireId, 'quick-typing');
+
+    const gameIndex = 0// TODO games.length oder so
+    this.gameService.loadGamePreparer(this.partyName, this.playerFireId, 'quick-typing', gameIndex);
   }
 }
