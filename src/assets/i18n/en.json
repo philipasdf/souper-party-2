@@ -1,38 +1,21 @@
 {
-    "common": {
-        "next": "next",
-        "back": "back"
-    },
-    "launcher": {
-        "home": {
-            "label": "Please enter your Nickname",
-            "placeholder": "Nickname"
-        },
-        "createorjoin": {
-            "label": "Please enter a party name",
-            "placeholder": "party name",
-            "create": "create",
-            "join": "join"
-        }
-    },
-    "success": {
-        "party": {
-            "created": "party '{{ name }}'  successfully created"
-        },
-        "player": {
-            "created": "player '{{ name }}' successfully joined party"
-        }
-    },
-    "errors": {
-        "party": {
-            "alreadyExists": "party '{{ name }}' already exists",
-            "doesNotExists": "party '{{ name }}' does not exist",
-            "createProcessFailed": "create party process failed",
-            "createDocumentFailed": "failed to save party"
-        },
-        "player": {
-            "alreadyExists": "player '{{ nickname }}' already exists in the party '{{ partyName }}'. Please go back and choose another nickname.",
-            "joinPartyFailed": "failed to join party"
-        }
-    }
+    "common.next": "next",
+    "common.back": "back",
+    "launcher.home.label": "Please enter your Nickname",
+    "launcher.home.placeholder": "Nickname",
+    "launcher.createorjoin.label": "Please enter a party name",
+    "launcher.createorjoin.placeholder": "party name",
+    "launcher.createorjoin.create": "create",
+    "launcher.createorjoin.join": "join",
+    "lobby.home.table.player": "Player",
+    "lobby.home.table.points": "Points",
+    "lobby.home.newGame": "New Game",
+    "success.party.created": "party '{{ name }}'  successfully created",
+    "success.player.created": "player '{{ name }}' successfully joined party",
+    "error.party.alreadyExists": "party '{{ name }}' already exists",
+    "error.party.doesNotExists": "party '{{ name }}' does not exist",
+    "error.party.createProcessFailed": "create party process failed",
+    "error.party.createDocumentFailed": "failed to save party",
+    "error.player.alreadyExists": "player '{{ nickname }}' already exists in the party '{{ partyName }}'. Please go back and choose another nickname.",
+    "error.player.joinPartyFailed": "failed to join party"
 }

@@ -19,6 +19,7 @@ import { environment } from 'src/environments/environment';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireStorageModule, BUCKET } from '@angular/fire/storage';
 import { LobbyModule } from './modules/lobby/lobby.module';
+import { GamesRoutingModule } from './modules/games/games-routing.module';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -37,6 +38,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     // custom modules
     LauncherModule,
     LobbyModule,
+    GamesRoutingModule,
 
     //ngx-translate
     TranslateModule.forRoot({

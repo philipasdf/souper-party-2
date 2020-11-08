@@ -9,12 +9,8 @@ const initialState: Party = {
 
 const reducer = createReducer(
     initialState,
-    on(partyActions.updateParty, (state, action) => { 
-        return action.party;
-    }),
-    on(partyActions.joinPartyIfExists, (state, { name }) => { 
-        return { ...state, name };
-    }),
+    on(partyActions.updateParty, (state, action) => (action.party)),
+    on(partyActions.joinPartyIfExists, (state, { name }) => ({ ...state, name })),
     on(partyActions.failed, (state, { errorMessage }) => { 
         console.error(errorMessage, state);
         return { ...state };

@@ -45,7 +45,8 @@ export class PlayerEffects {
                             const player: Player = {
                                 id: action.player,
                                 name: action.player,
-                                fireId: this.afs.createId()
+                                fireId: this.afs.createId(),
+                                points: 0
                             }    
                             return ({ type: CREATE_PLAYER, party: action.party, player });
                         }

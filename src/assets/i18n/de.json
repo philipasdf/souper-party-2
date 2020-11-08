@@ -1,38 +1,21 @@
 {
-    "common": {
-        "next": "weiter",
-        "back": "zurück"
-    },
-    "launcher": {
-        "home": {
-            "label": "Bitte gebe deinen Nicknamen ein",
-            "placeholder": "Nickname"
-        },
-        "createorjoin": {
-            "label": "Bitte gebe einen Party-Namen ein",
-            "placeholder": "Party-Name",
-            "create": "erstellen",
-            "join": "beitreten"
-        }
-    },
-    "success": {
-        "party": {
-            "created": "Party \"{{ name }}\" erfolgreich erstellt"
-        },
-        "player": {
-            "created": "Spieler '{{ name }}' ist der Party erfolgreich beigetreten"
-        }
-    },
-    "error": {
-        "party": {
-            "alreadyExists": "Party \"{{ name }}\" existiert bereits",
-            "doesNotExists": "Party \"{{ name }}\" existiert nicht",
-            "createProcessFailed": "Party konnte nicht erstellt werden",
-            "createDocumentFailed": "Party nicht gespeichert werden"
-        },
-        "player": {
-            "alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",
-            "joinPartyFailed": "Party konnte nicht beigetreten werden"
-        }
-    }
+    "common.next": "weiter",
+    "common.back": "zurück",
+    "launcher.home.label": "Bitte gebe deinen Nicknamen ein",
+    "launcher.home.placeholder": "Nickname",
+    "launcher.createorjoin.label": "Bitte gebe einen Party-Namen ein",
+    "launcher.createorjoin.placeholder": "Party-Name",
+    "launcher.createorjoin.create": "erstellen",
+    "launcher.createorjoin.join": "beitreten",
+    "lobby.home.table.player": "Spieler",
+    "lobby.home.table.points": "Punkte",
+    "lobby.home.newGame": "Neues Spiel",
+    "success.party.created": "Party \"{{ name }}\" erfolgreich erstellt",
+    "success.player.created": "Spieler '{{ name }}' ist der Party erfolgreich beigetreten",
+    "error.party.alreadyExists": "Party \"{{ name }}\" existiert bereits",
+    "error.party.doesNotExists": "Party \"{{ name }}\" existiert nicht",
+    "error.party.createProcessFailed": "Party konnte nicht erstellt werden",
+    "error.party.createDocumentFailed": "Party nicht gespeichert werden",
+    "error.player.alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",
+    "error.player.joinPartyFailed": "Party konnte nicht beigetreten werden"
 }
