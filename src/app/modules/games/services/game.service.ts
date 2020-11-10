@@ -16,7 +16,7 @@ export class GameService {
         this.router.navigate([`${gameName}/prepare-data/${partyName}/${hostFireId}/${gameIndex}`]);
     }
 
-    createGame(partyName: string, gameData: GameData, index: number) {
+    createGame(partyName: string, gameData: GameData<any>, index: number) {
 
         const game: Game = {
             id: gameData.name,

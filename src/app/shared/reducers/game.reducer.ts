@@ -9,7 +9,7 @@ export const initialState = adapter.getInitialState();
 
 const reducer = createReducer(
     initialState,
-    on(gameActions.createGame, (state, action) => adapter.addOne(action.game, state))
+    on(gameActions.createGame, (state, action) => adapter.addOne(action.game, state)) // TODO maybe redundant with game.query
 );
 
 export function gameReducer(state: State | undefined, action: Action) {

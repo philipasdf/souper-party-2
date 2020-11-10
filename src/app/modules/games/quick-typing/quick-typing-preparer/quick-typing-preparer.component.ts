@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { GameService } from '../../services/game.service';
 import { QuickTypingData } from '../quick-typing-data';
 import { GameData } from '../../game-data';
-import { Actions, ofType } from '@ngrx/effects';
-import { CREATE_SUCCESS } from 'src/app/shared/actions/game.actions';
+import { Store } from '@ngrx/store';
+import { queryPlayers } from 'src/app/shared/actions/player.actions';
+import { updateParty } from 'src/app/shared/actions/party.actions';
+import { Party } from 'src/app/shared/models/party.model';
 
 @Component({
   selector: 'app-quick-typing-preparer',
@@ -12,13 +14,17 @@ import { CREATE_SUCCESS } from 'src/app/shared/actions/game.actions';
 })
 export class QuickTypingPreparerComponent implements OnInit {
 
-  constructor(private route: ActivatedRoute, private gameService: GameService, private actions$: Actions, private router: Router) { }
+  constructor(private route: ActivatedRoute, private gameService: GameService, private store: Store) { }
 
   ngOnInit(): void {
     const partyName = this.route.snapshot.params['partyName'];
     const hostFireId = this.route.snapshot.params['hostFireId'];
     const gameIndex = this.route.snapshot.params['gameIndex'];
 
+
+    const party: Party = { name: partyName, host: '', hostFireId: hostFireId };
+    this.store.dispatch(updateParty({ party }));
+    this.store.dispatch(queryPlayers({party: partyName}));
 
     const gameData: GameData<QuickTypingData> = {
       name: 'quick-typing',
@@ -28,19 +34,6 @@ export class QuickTypingPreparerComponent implements OnInit {
     }
 
     this.gameService.createGame(partyName, gameData, gameIndex);
-
-
-
-
-    // TODO move this somewhere else
-    this.actions$
-      .pipe(ofType(CREATE_SUCCESS))
-      .subscribe(() => {
-
-        // dispatch store set all players state action
-
-          this.router.navigate([`lobby/${partyName}/${hostFireId}`]);
-      });
   }
 
 }

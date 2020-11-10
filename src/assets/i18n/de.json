@@ -14,7 +14,7 @@
     "success.player.created": "Spieler \"{{ name }}\" ist der Party erfolgreich beigetreten",
     "success.game.created": "Spiel mit der Id \"{{ id }}\" wurde erfolgreich erstellt",
     "error.party.alreadyExists": "Party \"{{ name }}\" existiert bereits",
-    "error.party.doesNotExists": "Party \"{{ name }}\" existiert nicht",
+    "error.party.doesNotExist": "Party \"{{ name }}\" existiert nicht",
     "error.party.createProcessFailed": "Party konnte nicht erstellt werden",
     "error.party.createDocumentFailed": "Party nicht gespeichert werden",
     "error.player.alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",

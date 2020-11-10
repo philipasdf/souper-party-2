@@ -1,37 +1,36 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, DocumentSnapshot } from '@angular/fire/firestore';
+import { DocumentSnapshot } from '@angular/fire/firestore';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { from, Observable, of } from 'rxjs';
+import {Observable, of } from 'rxjs';
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
-import { CREATE_PARTY, CREATE_PARTY_IF_NOT_ALREADY_EXISTS, FAILED, joinPartyIfExists, JOIN_PARTY_IF_EXISTS, QUERY_PARTY, SUCCESS, UPDATE_PARTY } from '../actions/party.actions';
+import { CreateParty, CreatePartyIfNotAlreadyExists, CREATE_PARTY, CREATE_PARTY_IF_NOT_ALREADY_EXISTS, FAILED, JoinPartyIfExists, joinPartyIfExists, JOIN_PARTY_IF_EXISTS, QueryParty, QUERY_PARTY, SUCCESS, UPDATE_PARTY } from '../actions/party.actions';
 import { CREATE_PLAYER_IF_NOT_ALREADY_EXISTS } from '../actions/player.actions';
+import { PartyFsService } from '../firestore-services/party-fs.service';
 import { Party } from '../models/party.model';
 import { selectCurrPlayer } from '../reducers/player.reducer';
-import { PARTY_PATH } from './firestore-paths';
 
 @Injectable()
 export class PartyEffects {
 
     constructor(private actions$: Actions, 
                 private store: Store<Party>, 
-                private afs: AngularFirestore, 
+                private partyFs: PartyFsService, 
                 private translate: TranslateService) {}
 
     @Effect()
     createPartyIfNotAlreadyExists$: Observable<Action> = this.actions$.pipe(
         ofType(CREATE_PARTY_IF_NOT_ALREADY_EXISTS),
-        switchMap( (action: any) => {
-            return this.afs.doc(`${PARTY_PATH}/${action.name}`)
-                .get()
+        switchMap( (action: CreatePartyIfNotAlreadyExists) => {
+            return this.partyFs.checkIfPartyExists(action.name)
                 .pipe(
                     map(doc => {
                         if (doc.exists) {
                             const errorMessage = this.translate.instant('error.party.alreadyExists', { name: action.name });
                             return ({ type: FAILED, errorMessage });
                         } else {
-                            return ({ type: CREATE_PARTY, name: action.name });
+                            return ({ type: CREATE_PARTY, partyName: action.name });
                         }
                     })
                 );
@@ -45,13 +44,13 @@ export class PartyEffects {
     createParty$: Observable<Action> = this.actions$.pipe(
         ofType(CREATE_PARTY),
         withLatestFrom(this.store.select(selectCurrPlayer)),
-        switchMap(([action, currPlayer]: [any, string]) => {
-            const partyName = action.name;
+        switchMap(([action, currPlayer]: [CreateParty, string]) => {
+            const partyName = action.partyName;
             const party: Party = {
                 name: partyName,
                 host: currPlayer
             }
-            return from(this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).set(party))
+            return this.partyFs.createParty(partyName, party)
                     .pipe(
                         map(() => {
                             const successMessage = this.translate.instant('success.party.created', { name: partyName });
@@ -67,14 +66,13 @@ export class PartyEffects {
     joinPartyIfExists$: Observable<Action> = this.actions$.pipe(
         ofType(JOIN_PARTY_IF_EXISTS),
         withLatestFrom(this.store.select(selectCurrPlayer)),
-        switchMap(([action, currPlayer]: [any, string]) => {
+        switchMap(([action, currPlayer]: [JoinPartyIfExists, string]) => {
             const partyName = action.name;
-            return this.afs.doc(`${PARTY_PATH}/${partyName}`)
-                .get()
+            return this.partyFs.checkIfPartyExists(partyName)
                 .pipe(
                     map((doc: DocumentSnapshot<Party>) => {
                         if (doc.exists) {
-                            return ({ type: CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, party: partyName, player: currPlayer });
+                            return ({ type: CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, party: partyName, playerName: currPlayer });
                         } else {
                             const errorMessage = this.translate.instant('error.party.doesNotExist', { name: partyName});
                             return ({ type: FAILED, errorMessage });
@@ -87,7 +85,7 @@ export class PartyEffects {
     @Effect()
     query$ = this.actions$.pipe(
         ofType(QUERY_PARTY),
-        switchMap((action: any) => this.afs.doc(`${PARTY_PATH}/${action.name}`).valueChanges()),
+        switchMap((action: QueryParty) => this.partyFs.fetchParty(action.name)),
         map((doc: Party) => {
             return ({ type: UPDATE_PARTY, party: doc });
         })
