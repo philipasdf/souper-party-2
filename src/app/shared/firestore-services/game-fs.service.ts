@@ -13,4 +13,7 @@ export class GameFsService {
         .add(JSON.parse(JSON.stringify(game)));
     }
 
+    fetchGames(partyName: string) {
+        return this.afs.collection(`${PARTY_PATH}/${partyName}/${GAME_PATH}`).valueChanges();
+    }
 }

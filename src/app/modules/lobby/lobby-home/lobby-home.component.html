@@ -1,8 +1,9 @@
 <h1>{{partyName}}</h1>
 
-<ng-container *ngIf="party$ | async as party">{{party | json }}
-    <ng-container *ngIf="currPlayer$ | async as currPlayer">
-    <table *ngIf="players$ | async as players">
+<ng-container *ngIf="party && players">
+    {{state | json }}
+    {{state | json }}
+    <table>
         <thead>
             <tr>
                 <th>{{'lobby.home.table.player' | translate}}</th>
@@ -10,7 +11,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let p of players" [ngClass]="{'currPlayer' : p.name === currPlayer}">
+            <tr *ngFor="let p of players" [ngClass]="{'currPlayer' : p.name === currPlayerName}">
                 <td>
                     {{p.name}}
                     <span *ngIf="party.host === p.name">(Host)</span>
@@ -22,13 +23,8 @@
         </tbody>
     </table>
 
-
-
-
-
-    <div *ngIf="party.host === currPlayer">
+    <div *ngIf="party.host === currPlayerName">
         <button (click)="onStartGame()">{{'lobby.home.newGame' | translate}}</button>
+        <button (click)="testDispatch()">test</button>
     </div>
-
-    </ng-container>
 </ng-container>

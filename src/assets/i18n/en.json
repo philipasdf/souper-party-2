@@ -17,6 +17,8 @@
     "error.party.doesNotExist": "party '{{ name }}' does not exist",
     "error.party.createProcessFailed": "create party process failed",
     "error.party.createDocumentFailed": "failed to save party",
+    "error.player.updateStepFailed": "failed to update player step",
+    "error.party.updateStepFailed": "failed to update party step",
     "error.player.alreadyExists": "player '{{ nickname }}' already exists in the party '{{ partyName }}'. Please go back and choose another nickname.",
     "error.player.joinPartyFailed": "failed to join party"
 }

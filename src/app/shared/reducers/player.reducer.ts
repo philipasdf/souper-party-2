@@ -17,7 +17,7 @@ const reducer = createReducer(
     on(playerActions.saveCurrPlayer, (state, { currPlayer }) => {
         return { ...state, currPlayer }
     }),
-    on(playerActions.updatePlayers, (state, { players }) => adapter.setAll(players, state))
+    on(playerActions.updatePlayers, (state, { players }) => adapter.setAll(players, state)),
 );
 
 export function playerReducer(state: State | undefined, action: Action) {
@@ -31,7 +31,7 @@ export const {
     selectEntities,
     selectAll
 } = adapter.getSelectors(selectFeature);
-export const selectCurrPlayer = createSelector(
-    selectFeature,
-    (state: State) => state.currPlayer
-);
+export const selectCurrPlayerName = createSelector(selectFeature, (state: State) => state.currPlayer);
+export const selectCurrPlayer = createSelector(selectFeature, (state: State, props) => {
+    return Object.values(state.entities).find(e => e.fireId === props.playerFireId);
+});

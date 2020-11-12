@@ -1,10 +1,19 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
+import { combineLatest, EMPTY, Subject } from 'rxjs';
+import { exhaustMap, filter, takeUntil, tap } from 'rxjs/operators';
+import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
-import { queryPlayers } from 'src/app/shared/actions/player.actions';
-import { selectParty } from 'src/app/shared/reducers/party.reducer';
-import * as players from 'src/app/shared/reducers/player.reducer';
+import { queryPlayers, setStep, SET_STEP_SUCCESS } from 'src/app/shared/actions/player.actions';
+import { Party } from 'src/app/shared/models/party.model';
+import { Player } from 'src/app/shared/models/player.model';
+import { AppState } from 'src/app/shared/reducers/app.reducer';
+import { selectPartyStep } from 'src/app/shared/reducers/party.reducer';
+import { selectCurrPlayer } from 'src/app/shared/reducers/player.reducer';
+import { Step } from 'src/app/shared/steps/step';
+import { STEP_CHECK_IN_GAME } from 'src/app/shared/steps/steps';
 import { GameService } from '../../games/services/game.service';
 
 @Component({
@@ -14,57 +23,100 @@ import { GameService } from '../../games/services/game.service';
 })
 export class LobbyHomeComponent implements OnInit, OnDestroy {
 
-  currPlayer$;
-  party$;
-  players$;
+  state: AppState; // for debugging
+  currPlayerName = '';
+  currPlayer: Player;
+  party: Party;
+  step: Step;
+  players: Player[];
   partyName = '';
   playerFireId = '';
 
-  constructor(private route: ActivatedRoute, private store: Store, private gameService: GameService) { }
+  unsub$ = new Subject();
+
+  constructor(private route: ActivatedRoute, 
+              private store: Store, 
+              private router: Router,
+              private gameService: GameService, 
+              private actions$: Actions) { }
+
+  ngOnDestroy() {
+    this.unsub$.next();
+    this.unsub$.complete();
+  }
 
   ngOnInit(): void {
     this.partyName = this.route.snapshot.params['partyName'];
     this.playerFireId = this.route.snapshot.params['playerFireId'];
 
     this.store.dispatch(queryParty({name: this.partyName}));
-    this.party$ = this.store.select(selectParty);
-
     this.store.dispatch(queryPlayers({party: this.partyName}));
-    this.players$ = this.store.select(players.selectAll);
+    this.store.dispatch(queryGames({partyName: this.partyName}));
 
-    this.currPlayer$ = this.store.select(players.selectCurrPlayer);
+    this.setData();
+    this.processSteps(this.playerFireId);
 
-    // inject stateManager
-    // if this is the host, then activate stateManager
-
-    // stateManager PLAYER
-    // subscribe to store.select(myplayer) 
-    // => if state(read-game-guide-and-check-in-game)
-    //      router.navigate('lobby-game-guide/gameId')
-
-
-    /**
-     * State Manager Host
-     * 
-     * if party state ('wait-for-players-to-check-in-game')
-     *    iterate all players and check if all have state 'ready-for-the-game'
-     *    dispatch(navigatePlayersToGame(game))
-     *    update all players ({state: 'playing-game'})
-     */
+    // TODO host has to watch if all players have step=partyStep && step.done = true
   }
 
-  ngOnDestroy() {
+  private setData() {
+    this.store.pipe(takeUntil(this.unsub$), filter(this.notEmpty)).subscribe((state: AppState) => {
+      this.state = state; // for debugging
+      this.party          = state.party;
+      this.step           = state.party.step;
+      this.currPlayerName = state.player.currPlayer;
+      this.currPlayer     = state.player.entities[this.currPlayerName];
+      this.players        = Object.values(state.player.entities);
+      // console.log('Set AppState', state);
+    });
+  }
+
+  private processSteps(playerFireId: string) {
+    const player$ = this.store.select(selectCurrPlayer, { playerFireId });
+    const partyStep$ = this.store.select(selectPartyStep);
+    combineLatest(player$, partyStep$)
+      .pipe(
+        filter(([player, partyStep]) => (!player || !partyStep) ? false : true),
+        tap(([player, partyStep]) => console.log(player.step, partyStep)),
+        exhaustMap(([player, partyStep]) => {
+          console.log('evaluate steps');
+          if (player.step.step !== partyStep.step) {
+            console.log('Party and Player have different steps -> update Player Step');
+            this.store.dispatch(setStep({ player: player , step: partyStep }));
+            return this.actions$.pipe(ofType(SET_STEP_SUCCESS));
+          }
+          else {
+            // player step = party step now
+            switch(partyStep.step) {
+              case(STEP_CHECK_IN_GAME.step):
+                if (!player.step.done) {
+                  console.log('TODO redirect to guide nooowww');
+                }
+                break;
+              default:
+                break;
+            }
+            return EMPTY;
+          }
+        })
+      ).subscribe();
   }
 
   onStartGame() {
-    // create game
-    // prepare data
-    // ??? party.state = 'wait-for-players-t ???
-    // service.createGameWithData
-    // store.dispatch(navigatePlayersToGameGuidePage(game))
-    // update all players ({state: 'read-game-guide-and-check-in-game'})
-
     const gameIndex = 0// TODO games.length oder so
     this.gameService.loadGamePreparer(this.partyName, this.playerFireId, 'quick-typing', gameIndex);
+  }
+
+  private notEmpty(state: AppState) {
+    if (state.party.name == '' || 
+        Object.keys(state.player.entities).length === 0 ||
+        !state.player.currPlayer) {
+      return false;
+    }
+    return true;
+  }
+
+  testDispatch() {
+    this.store.dispatch(setStep({ player: this.currPlayer, step: STEP_CHECK_IN_GAME }));
   }
 }

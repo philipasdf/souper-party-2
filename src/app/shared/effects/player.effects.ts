@@ -1,21 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, JOIN_PARTY_SUCCESS, SUCCESS, QUERY_PLAYERS, UPDATE_PLAYERS, CreatePlayer, CreatePlayerIfNotAlreadyExists, QueryPlayers, SaveCurrPlayer } from '../actions/player.actions';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, JOIN_PARTY_SUCCESS, SUCCESS, QUERY_PLAYERS, UPDATE_PLAYERS, CreatePlayer, CreatePlayerIfNotAlreadyExists, QueryPlayers, SaveCurrPlayer, SET_STEP, SetStep } from '../actions/player.actions';
+import { catchError, exhaust, exhaustMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { CURR_PLAYER_KEY } from '../local-storage-keys';
 import { TranslateService } from '@ngx-translate/core';
 import { FAILED } from '../actions/party.actions';
 import { PlayerFsService } from '../firestore-services/player-fs.service';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Player } from '../models/player.model';
+import { IDLE } from '../steps/steps';
+import { selectPartyName } from '../reducers/party.reducer';
 
 @Injectable()
 export class PlayerEffects {
 
         
     constructor(private actions$: Actions, 
+        private store: Store,
         private playerFs: PlayerFsService, 
         private afs: AngularFirestore,
         private translate: TranslateService) {}
@@ -44,7 +47,8 @@ export class PlayerEffects {
                                 id: action.playerName,
                                 name: action.playerName,
                                 fireId: this.afs.createId(),
-                                points: 0
+                                points: 0,
+                                step: IDLE
                             }  
                             return ({ type: CREATE_PLAYER, partyName: action.party, player });
                         }
@@ -73,9 +77,18 @@ export class PlayerEffects {
     query$ = this.actions$.pipe(
         ofType(QUERY_PLAYERS),
         switchMap((action: QueryPlayers) => this.playerFs.fetchPlayers(action.party)),
-        map((col) => {
-            console.log(col);
-            return ({ type: UPDATE_PLAYERS, players: col });
-        })
-    )
+        map((col) => ({ type: UPDATE_PLAYERS, players: col }))
+    );
+
+    @Effect()
+    setStep$ = this.actions$.pipe(
+        ofType(SET_STEP),
+        withLatestFrom(this.store.select(selectPartyName)),
+        exhaustMap(([action, partyName]: [SetStep, string]) => this.playerFs.setStep(partyName, action.player.name, action.step)),
+        map(() => {
+            console.log('%c SERVICE: setStep success', 'color: green');
+            return ({ type: SUCCESS, successMessage: 'successfully updated step' });
+        }),
+        catchError(err => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateStepFailed') }))
+    );
 }

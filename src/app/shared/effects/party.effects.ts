@@ -5,11 +5,13 @@ import { Action, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import {Observable, of } from 'rxjs';
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
-import { CreateParty, CreatePartyIfNotAlreadyExists, CREATE_PARTY, CREATE_PARTY_IF_NOT_ALREADY_EXISTS, FAILED, JoinPartyIfExists, joinPartyIfExists, JOIN_PARTY_IF_EXISTS, QueryParty, QUERY_PARTY, SUCCESS, UPDATE_PARTY } from '../actions/party.actions';
+import { CreateParty, CreatePartyIfNotAlreadyExists, CREATE_PARTY, CREATE_PARTY_IF_NOT_ALREADY_EXISTS, FAILED, JoinPartyIfExists, joinPartyIfExists, JOIN_PARTY_IF_EXISTS, QueryParty, QUERY_PARTY, SetStep, SET_STEP, SUCCESS, UPDATE_PARTY } from '../actions/party.actions';
 import { CREATE_PLAYER_IF_NOT_ALREADY_EXISTS } from '../actions/player.actions';
 import { PartyFsService } from '../firestore-services/party-fs.service';
 import { Party } from '../models/party.model';
-import { selectCurrPlayer } from '../reducers/player.reducer';
+import { selectCurrPlayerName } from '../reducers/player.reducer';
+import { selectPartyName } from '../reducers/party.reducer';
+import { IDLE } from '../steps/steps';
 
 @Injectable()
 export class PartyEffects {
@@ -43,12 +45,13 @@ export class PartyEffects {
     @Effect()
     createParty$: Observable<Action> = this.actions$.pipe(
         ofType(CREATE_PARTY),
-        withLatestFrom(this.store.select(selectCurrPlayer)),
+        withLatestFrom(this.store.select(selectCurrPlayerName)),
         switchMap(([action, currPlayer]: [CreateParty, string]) => {
             const partyName = action.partyName;
             const party: Party = {
                 name: partyName,
-                host: currPlayer
+                host: currPlayer,
+                step: IDLE
             }
             return this.partyFs.createParty(partyName, party)
                     .pipe(
@@ -65,7 +68,7 @@ export class PartyEffects {
     @Effect()
     joinPartyIfExists$: Observable<Action> = this.actions$.pipe(
         ofType(JOIN_PARTY_IF_EXISTS),
-        withLatestFrom(this.store.select(selectCurrPlayer)),
+        withLatestFrom(this.store.select(selectCurrPlayerName)),
         switchMap(([action, currPlayer]: [JoinPartyIfExists, string]) => {
             const partyName = action.name;
             return this.partyFs.checkIfPartyExists(partyName)
@@ -89,5 +92,14 @@ export class PartyEffects {
         map((doc: Party) => {
             return ({ type: UPDATE_PARTY, party: doc });
         })
-    )
+    );
+
+    @Effect()
+    setStep$ = this.actions$.pipe(
+        ofType(SET_STEP),
+        withLatestFrom(this.store.select(selectPartyName)),
+        switchMap(([action, partyName]: [SetStep, string]) => this.partyFs.setStep(partyName, action.step)),
+        map(() => ({ type: SUCCESS, successMessage: 'successfully updated step' })),
+        catchError(err => of({ type: FAILED, errorMessage: this.translate.instant('error.party.updateStepFailed') }))
+    );
 }

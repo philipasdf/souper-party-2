@@ -16,7 +16,9 @@
     "error.party.alreadyExists": "Party \"{{ name }}\" existiert bereits",
     "error.party.doesNotExist": "Party \"{{ name }}\" existiert nicht",
     "error.party.createProcessFailed": "Party konnte nicht erstellt werden",
-    "error.party.createDocumentFailed": "Party nicht gespeichert werden",
+    "error.party.createDocumentFailed": "Party konnte nicht gespeichert werden",
+    "error.party.updateStepFailed": "Party Step konnte nicht geupdated werden",
+    "error.player.updateStepFailed": "Player Step konnte nicht geupdated werden",
     "error.player.alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",
     "error.player.joinPartyFailed": "Party konnte nicht beigetreten werden"
 }

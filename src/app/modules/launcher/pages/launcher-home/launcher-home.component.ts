@@ -18,7 +18,7 @@ export class LauncherHomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.playerStore.select(playerReducer.selectCurrPlayer).subscribe(currPlayer => {
+    this.playerStore.select(playerReducer.selectCurrPlayerName).subscribe(currPlayer => {
       this.nameInput = currPlayer;
     });
   }
