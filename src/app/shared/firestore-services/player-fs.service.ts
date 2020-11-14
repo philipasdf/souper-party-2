@@ -23,7 +23,7 @@ export class PlayerFsService {
     }
 
     setStep(partyName: string, playerName: string, step: Step) {
-        console.log('%c SERVICE: setStep -> ' + step.step, 'color: green');
+        console.log(`%c SERVICE: setStep -> ${step.step} -> ${step.done}`, 'color: green');
         const ref = this.afs.doc<Player>(`${PARTY_PATH}/${partyName}/${PLAYER_PATH}/${playerName}`);
         return from(ref.update({ step }));
     }

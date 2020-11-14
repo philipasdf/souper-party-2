@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, JOIN_PARTY_SUCCESS, SUCCESS, QUERY_PLAYERS, UPDATE_PLAYERS, CreatePlayer, CreatePlayerIfNotAlreadyExists, QueryPlayers, SaveCurrPlayer, SET_STEP, SetStep } from '../actions/player.actions';
+import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, JOIN_PARTY_SUCCESS, SUCCESS, QUERY_PLAYERS, UPDATE_PLAYERS, CreatePlayer, CreatePlayerIfNotAlreadyExists, QueryPlayers, SaveCurrPlayer, SET_STEP, SetStep, SET_STEP_SUCCESS } from '../actions/player.actions';
 import { catchError, exhaust, exhaustMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { CURR_PLAYER_KEY } from '../local-storage-keys';
 import { TranslateService } from '@ngx-translate/core';
@@ -76,7 +76,7 @@ export class PlayerEffects {
     @Effect()
     query$ = this.actions$.pipe(
         ofType(QUERY_PLAYERS),
-        switchMap((action: QueryPlayers) => this.playerFs.fetchPlayers(action.party)),
+        exhaustMap((action: QueryPlayers) => this.playerFs.fetchPlayers(action.party)),
         map((col) => ({ type: UPDATE_PLAYERS, players: col }))
     );
 
@@ -87,7 +87,7 @@ export class PlayerEffects {
         exhaustMap(([action, partyName]: [SetStep, string]) => this.playerFs.setStep(partyName, action.player.name, action.step)),
         map(() => {
             console.log('%c SERVICE: setStep success', 'color: green');
-            return ({ type: SUCCESS, successMessage: 'successfully updated step' });
+            return ({ type: SET_STEP_SUCCESS });
         }),
         catchError(err => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateStepFailed') }))
     );

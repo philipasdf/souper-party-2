@@ -1,1 +1,5 @@
-<p>lobby-game-guide works!</p>
+<h1>{{gameDisplayName}}</h1>
+
+<p [innerHTML]="gameDisplayInstructions | translate"></p>
+
+<button (click)="onCheckInGame()">OK!</button>

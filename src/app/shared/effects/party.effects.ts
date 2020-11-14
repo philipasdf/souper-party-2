@@ -4,7 +4,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import {Observable, of } from 'rxjs';
-import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { catchError, exhaustMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { CreateParty, CreatePartyIfNotAlreadyExists, CREATE_PARTY, CREATE_PARTY_IF_NOT_ALREADY_EXISTS, FAILED, JoinPartyIfExists, joinPartyIfExists, JOIN_PARTY_IF_EXISTS, QueryParty, QUERY_PARTY, SetStep, SET_STEP, SUCCESS, UPDATE_PARTY } from '../actions/party.actions';
 import { CREATE_PLAYER_IF_NOT_ALREADY_EXISTS } from '../actions/player.actions';
 import { PartyFsService } from '../firestore-services/party-fs.service';
@@ -88,10 +88,8 @@ export class PartyEffects {
     @Effect()
     query$ = this.actions$.pipe(
         ofType(QUERY_PARTY),
-        switchMap((action: QueryParty) => this.partyFs.fetchParty(action.name)),
-        map((doc: Party) => {
-            return ({ type: UPDATE_PARTY, party: doc });
-        })
+        exhaustMap((action: QueryParty) => this.partyFs.fetchParty(action.name)),
+        map((doc: Party) => ({ type: UPDATE_PARTY, party: doc }))
     );
 
     @Effect()

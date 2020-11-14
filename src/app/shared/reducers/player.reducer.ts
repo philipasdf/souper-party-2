@@ -35,3 +35,6 @@ export const selectCurrPlayerName = createSelector(selectFeature, (state: State)
 export const selectCurrPlayer = createSelector(selectFeature, (state: State, props) => {
     return Object.values(state.entities).find(e => e.fireId === props.playerFireId);
 });
+export const selectCurrPlayerStep = createSelector(selectFeature, (state: State, props) => {
+    return Object.values(state.entities).find(e => e.fireId === props.playerFireId)?.step;
+});

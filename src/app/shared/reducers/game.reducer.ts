@@ -1,4 +1,4 @@
-import { Action, createFeatureSelector, createReducer, on } from '@ngrx/store';
+import { Action, createFeatureSelector, createReducer, createSelector, on } from '@ngrx/store';
 import { Game } from "../models/game.model";
 import * as gameActions from '../actions/game.actions';
 import { createEntityAdapter, EntityState } from '@ngrx/entity';
@@ -21,3 +21,4 @@ export function gameReducer(state: State | undefined, action: Action) {
 // Selectors
 export const selectFeature = createFeatureSelector<State>('game');
 export const { selectAll } = adapter.getSelectors(selectFeature);
+// export const selectCurrGame = createSelector(selectFeature, (state: State) => state.);

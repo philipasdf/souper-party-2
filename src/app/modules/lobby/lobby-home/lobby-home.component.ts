@@ -11,7 +11,7 @@ import { Party } from 'src/app/shared/models/party.model';
 import { Player } from 'src/app/shared/models/player.model';
 import { AppState } from 'src/app/shared/reducers/app.reducer';
 import { selectPartyStep } from 'src/app/shared/reducers/party.reducer';
-import { selectCurrPlayer } from 'src/app/shared/reducers/player.reducer';
+import { selectCurrPlayer, selectCurrPlayerStep } from 'src/app/shared/reducers/player.reducer';
 import { Step } from 'src/app/shared/steps/step';
 import { STEP_CHECK_IN_GAME } from 'src/app/shared/steps/steps';
 import { GameService } from '../../games/services/game.service';
@@ -76,30 +76,39 @@ export class LobbyHomeComponent implements OnInit, OnDestroy {
     const partyStep$ = this.store.select(selectPartyStep);
     combineLatest(player$, partyStep$)
       .pipe(
-        filter(([player, partyStep]) => (!player || !partyStep) ? false : true),
+        takeUntil(this.unsub$),
+        filter(([player, partyStep]) => (!!player && !!partyStep)),
         tap(([player, partyStep]) => console.log(player.step, partyStep)),
         exhaustMap(([player, partyStep]) => {
-          console.log('evaluate steps');
+          console.log('evaluate steps between player and party');
           if (player.step.step !== partyStep.step) {
             console.log('Party and Player have different steps -> update Player Step');
             this.store.dispatch(setStep({ player: player , step: partyStep }));
             return this.actions$.pipe(ofType(SET_STEP_SUCCESS));
           }
-          else {
-            // player step = party step now
-            switch(partyStep.step) {
-              case(STEP_CHECK_IN_GAME.step):
-                if (!player.step.done) {
-                  console.log('TODO redirect to guide nooowww');
-                }
-                break;
-              default:
-                break;
-            }
-            return EMPTY;
-          }
+          return EMPTY;
         })
       ).subscribe();
+
+    this.store.select(selectCurrPlayerStep, { playerFireId }).pipe(
+        takeUntil(this.unsub$),
+        filter(playerStep => !!playerStep)).subscribe(playerStep => {
+      console.log('evaluate step of player', playerStep);
+      switch(playerStep.step) {
+        case(STEP_CHECK_IN_GAME.step):
+          if (!playerStep.done) {
+            console.log('navigate to game-guide');
+            this.router.navigate(['game-guide'], { relativeTo: this.route });
+          }
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
+  isPlayerReadyForTheGame(player: Player) {
+    return (player?.step?.step === STEP_CHECK_IN_GAME.step && player.step?.done);
   }
 
   onStartGame() {

@@ -10,6 +10,7 @@
     "lobby.home.table.player": "Spieler",
     "lobby.home.table.points": "Punkte",
     "lobby.home.newGame": "Neues Spiel",
+    "lobby.guide.rdy": "Ok",
     "success.party.created": "Party \"{{ name }}\" erfolgreich erstellt",
     "success.player.created": "Spieler \"{{ name }}\" ist der Party erfolgreich beigetreten",
     "success.game.created": "Spiel mit der Id \"{{ id }}\" wurde erfolgreich erstellt",
@@ -20,5 +21,7 @@
     "error.party.updateStepFailed": "Party Step konnte nicht geupdated werden",
     "error.player.updateStepFailed": "Player Step konnte nicht geupdated werden",
     "error.player.alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",
-    "error.player.joinPartyFailed": "Party konnte nicht beigetreten werden"
+    "error.player.joinPartyFailed": "Party konnte nicht beigetreten werden",
+    "game.quick-typing.name": "Schnellfinger",
+    "game.quick-typing.instructions": "Tippe den vorgegebenen Text so schnell es geht ab! Für jeden richtigen Buchstaben gibt es einen Punkt. Vertippst du dich, gibt es Punktabzug. Achte auf deine eingestellte <b>Autokorrektur</b>! 😜"
 }

@@ -8,6 +8,7 @@
             <tr>
                 <th>{{'lobby.home.table.player' | translate}}</th>
                 <th>{{'lobby.home.table.points' | translate}}</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -19,6 +20,7 @@
                 <td>
                     {{p.points}}
                 </td>
+                <td>{{isPlayerReadyForTheGame(p)}}</td>
             </tr>
         </tbody>
     </table>

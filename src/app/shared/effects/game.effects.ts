@@ -3,7 +3,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, exhaustMap, map, switchMap } from 'rxjs/operators';
 import { CreateGame, CREATE_GAME, QueryGames, QUERY_GAMES, success, UPDATE_GAMES } from '../actions/game.actions';
 import { FAILED } from '../actions/game.actions';
 import { SET_STEP } from '../actions/party.actions';
@@ -35,7 +35,7 @@ export class GameEffects {
     @Effect()
     query$ = this.actions$.pipe(
         ofType(QUERY_GAMES),
-        switchMap((action: QueryGames) => this.gameFs.fetchGames(action.partyName)),
+        exhaustMap((action: QueryGames) => this.gameFs.fetchGames(action.partyName)),
         map((col) => ({ type: UPDATE_GAMES, games: col }))
     );
     

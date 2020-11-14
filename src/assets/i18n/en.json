@@ -10,6 +10,7 @@
     "lobby.home.table.player": "Player",
     "lobby.home.table.points": "Points",
     "lobby.home.newGame": "New Game",
+    "lobby.guide.rdy": "Ok",
     "success.party.created": "party '{{ name }}'  successfully created",
     "success.player.created": "player '{{ name }}' successfully joined party",
     "success.game.created": "game with id '{{ id }}' successfully created",
@@ -20,5 +21,7 @@
     "error.player.updateStepFailed": "failed to update player step",
     "error.party.updateStepFailed": "failed to update party step",
     "error.player.alreadyExists": "player '{{ nickname }}' already exists in the party '{{ partyName }}'. Please go back and choose another nickname.",
-    "error.player.joinPartyFailed": "failed to join party"
+    "error.player.joinPartyFailed": "failed to join party",
+    "game.quick-typing.name": "Quick Typing",
+    "game.quick-typing.instructions": ""
 }
