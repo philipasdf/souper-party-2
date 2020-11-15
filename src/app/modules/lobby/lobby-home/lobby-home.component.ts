@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { combineLatest, EMPTY, Subject } from 'rxjs';
-import { exhaustMap, filter, takeUntil, tap } from 'rxjs/operators';
+import { exhaustMap, filter, map, takeUntil, tap } from 'rxjs/operators';
 import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
 import { queryPlayers, setPlayerStep, SET_PLAYER_STEP_SUCCESS } from 'src/app/shared/actions/player.actions';
@@ -79,14 +79,14 @@ export class LobbyHomeComponent implements OnInit, OnDestroy {
         takeUntil(this.unsub$),
         filter(([player, partyStep]) => (!!player && !!partyStep)),
         // tap(([player, partyStep]) => console.log(player.step, partyStep)),
-        exhaustMap(([player, partyStep]) => {
+        map(([player, partyStep]) => {
           console.log('evaluate steps between player and party', player.step, partyStep);
           if (player.step.step !== partyStep.step) {
             console.log('Party and Player have different steps -> update Player Step');
             this.store.dispatch(setPlayerStep({ player: player , step: partyStep }));
-            return this.actions$.pipe(ofType(SET_PLAYER_STEP_SUCCESS));
+            // return this.actions$.pipe(ofType(SET_PLAYER_STEP_SUCCESS));
           }
-          return EMPTY;
+          // return EMPTY;
         })
       ).subscribe();
 
