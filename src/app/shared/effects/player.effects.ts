@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
-import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, JOIN_PARTY_SUCCESS, SUCCESS, QUERY_PLAYERS, UPDATE_PLAYERS, CreatePlayer, CreatePlayerIfNotAlreadyExists, QueryPlayers, SaveCurrPlayer, SET_STEP, SetStep, SET_STEP_SUCCESS } from '../actions/player.actions';
-import { catchError, exhaust, exhaustMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { CREATE_PLAYER, CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, SAVE_CURR_PLAYER, JOIN_PARTY_SUCCESS, SUCCESS, QUERY_PLAYERS, UPDATE_PLAYERS, CreatePlayer, CreatePlayerIfNotAlreadyExists, QueryPlayers, SaveCurrPlayer, SET_PLAYER_STEP, SetPlayerStep, SET_PLAYER_STEP_SUCCESS } from '../actions/player.actions';
+import { catchError, exhaust, exhaustMap, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
 import { CURR_PLAYER_KEY } from '../local-storage-keys';
 import { TranslateService } from '@ngx-translate/core';
 import { FAILED } from '../actions/party.actions';
@@ -82,12 +82,13 @@ export class PlayerEffects {
 
     @Effect()
     setStep$ = this.actions$.pipe(
-        ofType(SET_STEP),
+        ofType(SET_PLAYER_STEP),
         withLatestFrom(this.store.select(selectPartyName)),
-        exhaustMap(([action, partyName]: [SetStep, string]) => this.playerFs.setStep(partyName, action.player.name, action.step)),
+        tap(() => console.log('I WANNA')),
+        switchMap(([action, partyName]: [SetPlayerStep, string]) => this.playerFs.setStep(partyName, action.player.name, action.step)),
         map(() => {
             console.log('%c SERVICE: setStep success', 'color: green');
-            return ({ type: SET_STEP_SUCCESS });
+            return ({ type: SET_PLAYER_STEP_SUCCESS });
         }),
         catchError(err => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateStepFailed') }))
     );

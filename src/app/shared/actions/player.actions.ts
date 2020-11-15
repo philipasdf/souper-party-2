@@ -32,10 +32,10 @@ export const joinPartySuccess = createAction(JOIN_PARTY_SUCCESS, props<{ success
 /**
  * Step (=States) (maybe more than one action?)
  */
-export const SET_STEP = `${PLAYER_TAG} set step`;
+export const SET_PLAYER_STEP = `${PLAYER_TAG} set step`;
 // export const setStep = createAction(SET_STEP, props<{ playerName: string, step: Step }>());
-export const setStep = createAction(SET_STEP, props<{ player: Player, step: Step }>());
-export type SetStep = ReturnType<typeof setStep>;
+export const setPlayerStep = createAction(SET_PLAYER_STEP, props<{ player: Player, step: Step }>());
+export type SetPlayerStep = ReturnType<typeof setPlayerStep>;
 
-export const SET_STEP_SUCCESS = `${PLAYER_TAG} set step success`;
-export const setStepSuccess = createAction(SET_STEP_SUCCESS);
+export const SET_PLAYER_STEP_SUCCESS = `${PLAYER_TAG} set step success`;
+export const setPlayerStepSuccess = createAction(SET_PLAYER_STEP_SUCCESS);

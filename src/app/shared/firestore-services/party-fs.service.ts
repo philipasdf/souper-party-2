@@ -26,4 +26,9 @@ export class PartyFsService {
         const ref = this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`);
         return from(ref.update({ step }));
     }
+
+    setCurrGameFireId(partyName: string, currGameIndex: number) {
+        const ref = this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`);
+        return from(ref.update({ currGameIndex }));
+    }
 }

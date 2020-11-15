@@ -11,6 +11,7 @@
     "lobby.home.table.points": "Points",
     "lobby.home.newGame": "New Game",
     "lobby.guide.rdy": "Ok",
+    "lobby.guide.wait": "Wait for other players...",
     "success.party.created": "party '{{ name }}'  successfully created",
     "success.player.created": "player '{{ name }}' successfully joined party",
     "success.game.created": "game with id '{{ id }}' successfully created",

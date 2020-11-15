@@ -11,6 +11,7 @@
     "lobby.home.table.points": "Punkte",
     "lobby.home.newGame": "Neues Spiel",
     "lobby.guide.rdy": "Ok",
+    "lobby.guide.wait": "Warte auf andere Spieler...",
     "success.party.created": "Party \"{{ name }}\" erfolgreich erstellt",
     "success.player.created": "Spieler \"{{ name }}\" ist der Party erfolgreich beigetreten",
     "success.game.created": "Spiel mit der Id \"{{ id }}\" wurde erfolgreich erstellt",

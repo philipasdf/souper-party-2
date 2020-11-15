@@ -35,6 +35,9 @@ export const alreadyExists = createAction(ALREADY_EXISTS);
 /**
  * Step (=States) (maybe more than one action?)
  */
-export const SET_STEP = `${PARTY_TAG} set step`;
-export const setStep = createAction(SET_STEP, props<{ step: Step }>());
-export type SetStep = ReturnType<typeof setStep>;
+export const SET_PARTY_STEP = `${PARTY_TAG} set step`;
+export const setPartyStep = createAction(SET_PARTY_STEP, props<{ step: Step }>());
+export type SetPartyStep = ReturnType<typeof setPartyStep>;
+
+export const SET_PARTY_STEP_SUCCESS = `${PARTY_TAG} set step success`;
+export const setPartyStepSuccess = createAction(SET_PARTY_STEP_SUCCESS);

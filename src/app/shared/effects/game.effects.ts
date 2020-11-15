@@ -2,12 +2,15 @@ import { Injectable } from "@angular/core";
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
+import { fstat } from 'fs';
 import { of } from 'rxjs';
-import { catchError, exhaustMap, map, switchMap } from 'rxjs/operators';
+import { catchError, combineAll, exhaustMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { CreateGame, CREATE_GAME, QueryGames, QUERY_GAMES, success, UPDATE_GAMES } from '../actions/game.actions';
 import { FAILED } from '../actions/game.actions';
-import { SET_STEP } from '../actions/party.actions';
+import { SET_PARTY_STEP } from '../actions/party.actions';
 import { GameFsService } from '../firestore-services/game-fs.service';
+import { PartyFsService } from '../firestore-services/party-fs.service';
+import { selectPartyName } from '../reducers/party.reducer';
 import { STEP_CHECK_IN_GAME } from '../steps/steps';
 
 @Injectable()
@@ -15,6 +18,7 @@ export class GameEffects {
 
     constructor(private actions$: Actions, 
                 private gameFs: GameFsService, 
+                private partyFs: PartyFsService, 
                 private translate: TranslateService, 
                 private store: Store) {}
 
@@ -22,12 +26,17 @@ export class GameEffects {
     createGame$ = this.actions$.pipe(
         ofType(CREATE_GAME),
         switchMap((action: CreateGame) => {
-                return this.gameFs.addGame(action.partyName, action.game);
+            return this.partyFs
+                .setCurrGameFireId(action.partyName, action.game.index)
+                .pipe(
+                    map(() => this.gameFs.addGame(action.partyName, action.game)),
+                    combineAll()
+                );
         }),
-        map((doc) => {
-            const successMessage = this.translate.instant('success.game.created', { id: doc.id });
+        map(() => {
+            const successMessage = this.translate.instant('success.game.created', { id: 'todoremove' });
             this.store.dispatch(success(successMessage));
-            return ({ type: SET_STEP, step: STEP_CHECK_IN_GAME });
+            return ({ type: SET_PARTY_STEP, step: STEP_CHECK_IN_GAME });
         }),
         catchError(err => of({ type: FAILED, errorMessage: 'Failed to create a game in firestore'}))
     );

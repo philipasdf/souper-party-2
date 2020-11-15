@@ -5,4 +5,5 @@ export interface Party {
     host: string;
     hostFireId?: string;
     step?: Step;
+    currGameIndex?: number;
 }

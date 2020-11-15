@@ -6,7 +6,7 @@ import { combineLatest, EMPTY, Subject } from 'rxjs';
 import { exhaustMap, filter, takeUntil, tap } from 'rxjs/operators';
 import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
-import { queryPlayers, setStep, SET_STEP_SUCCESS } from 'src/app/shared/actions/player.actions';
+import { queryPlayers, setPlayerStep, SET_PLAYER_STEP_SUCCESS } from 'src/app/shared/actions/player.actions';
 import { Party } from 'src/app/shared/models/party.model';
 import { Player } from 'src/app/shared/models/player.model';
 import { AppState } from 'src/app/shared/reducers/app.reducer';
@@ -78,13 +78,13 @@ export class LobbyHomeComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.unsub$),
         filter(([player, partyStep]) => (!!player && !!partyStep)),
-        tap(([player, partyStep]) => console.log(player.step, partyStep)),
+        // tap(([player, partyStep]) => console.log(player.step, partyStep)),
         exhaustMap(([player, partyStep]) => {
-          console.log('evaluate steps between player and party');
+          console.log('evaluate steps between player and party', player.step, partyStep);
           if (player.step.step !== partyStep.step) {
             console.log('Party and Player have different steps -> update Player Step');
-            this.store.dispatch(setStep({ player: player , step: partyStep }));
-            return this.actions$.pipe(ofType(SET_STEP_SUCCESS));
+            this.store.dispatch(setPlayerStep({ player: player , step: partyStep }));
+            return this.actions$.pipe(ofType(SET_PLAYER_STEP_SUCCESS));
           }
           return EMPTY;
         })
@@ -107,9 +107,7 @@ export class LobbyHomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  isPlayerReadyForTheGame(player: Player) {
-    return (player?.step?.step === STEP_CHECK_IN_GAME.step && player.step?.done);
-  }
+  
 
   onStartGame() {
     const gameIndex = 0// TODO games.length oder so
@@ -123,9 +121,5 @@ export class LobbyHomeComponent implements OnInit, OnDestroy {
       return false;
     }
     return true;
-  }
-
-  testDispatch() {
-    this.store.dispatch(setStep({ player: this.currPlayer, step: STEP_CHECK_IN_GAME }));
   }
 }

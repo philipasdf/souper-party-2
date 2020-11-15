@@ -8,7 +8,6 @@
             <tr>
                 <th>{{'lobby.home.table.player' | translate}}</th>
                 <th>{{'lobby.home.table.points' | translate}}</th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -20,13 +19,11 @@
                 <td>
                     {{p.points}}
                 </td>
-                <td>{{isPlayerReadyForTheGame(p)}}</td>
             </tr>
         </tbody>
     </table>
 
     <div *ngIf="party.host === currPlayerName">
         <button (click)="onStartGame()">{{'lobby.home.newGame' | translate}}</button>
-        <button (click)="testDispatch()">test</button>
     </div>
 </ng-container>

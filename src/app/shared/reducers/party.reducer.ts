@@ -29,3 +29,4 @@ export const selectFeature = createFeatureSelector<Party>('party');
 export const selectParty = createSelector(selectFeature, state => state);
 export const selectPartyName = createSelector(selectFeature, state => state.name);
 export const selectPartyStep = createSelector(selectFeature, state => state.step);
+export const selectCurrGameIndex = createSelector(selectFeature, state => state.currGameIndex);

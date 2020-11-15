@@ -2,4 +2,11 @@
 
 <p [innerHTML]="gameDisplayInstructions | translate"></p>
 
-<button (click)="onCheckInGame()">OK!</button>
+<button *ngIf="!checkedIn" (click)="onCheckInGame()">OK!</button>
+
+<div *ngIf="checkedIn">
+    <h2>{{'lobby.guide.wait' | translate}}</h2>
+    <ng-container *ngIf="players$ | async as players">
+        <p *ngFor="let p of players">{{p.name}} {{p.step.done}}</p>
+    </ng-container>
+</div>
