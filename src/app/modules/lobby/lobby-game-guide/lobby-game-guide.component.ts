@@ -6,7 +6,6 @@ import { combineLatest, Observable } from 'rxjs';
 import { filter, takeUntil, tap } from 'rxjs/operators';
 import { setPartyStep } from 'src/app/shared/actions/party.actions';
 import { setPlayerStep } from 'src/app/shared/actions/player.actions';
-import { Game } from 'src/app/shared/models/game.model';
 import { Player } from 'src/app/shared/models/player.model';
 import { Step } from 'src/app/shared/steps/step';
 import { STEP_CHECK_IN_GAME, STEP_PLAY_GAME } from 'src/app/shared/steps/steps';
@@ -22,11 +21,10 @@ import * as players from 'src/app/shared/reducers/player.reducer';
 })
 export class LobbyGameGuideComponent extends LobbyParentComponent implements OnInit {
 
-  
   currPlayer$: Observable<Player>;
   players$: Observable<Player[]>;
+  
   checkedIn = false;
-
   gameDisplayName = '';
   gameDisplayInstructions = '';
 
@@ -46,6 +44,7 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
     this.initDisplayData();
     this.processPartyStep();
     this.processPlayerStep(this.playerFireId);
+    this.hostStepProcessing();
   }
 
   onCheckInGame() {
@@ -61,9 +60,7 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
   }
 
   private initDisplayData() {
-    // TODO use games.selectCurrGame
-    this.store.select(games.selectAll).pipe(takeUntil(this.unsub$)).subscribe(games => {
-      const currGame = games[0]; 
+    this.store.select(games.selectCurrGame).pipe(takeUntil(this.unsub$)).subscribe(currGame => {
       if (currGame) {
         this.gameDisplayName = this.translate.instant(`game.${currGame.id}.name`);
         this.gameDisplayInstructions = this.translate.instant(`game.${currGame.id}.instructions`);
@@ -100,25 +97,21 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
           }
         })
       ).subscribe();
+  }
 
-    /**
-     * HOST CONTROLS PARTY STEP
-     */
-    const party$ = this.store.select(selectParty).pipe(filter(p => p.name !== ''));
-    // const players$ = this.store.select(players.selectAll);
-    combineLatest(party$, this.players$)
-      .pipe(
-        takeUntil(this.unsub$),
-        tap(([party, players]) => {
-          if (players.every(p => p.step.step === STEP_CHECK_IN_GAME.step && p.step.done)) {
-            // all players are ready for the game
-            this.store.dispatch(setPartyStep({ step: STEP_PLAY_GAME }));
-            // const success$ = this.actions$.pipe(ofType(SET_PLAYER_STEP_SUCCESS));
-            // const failed$ = this.actions$.pipe(ofType(FAILED));
-            // return race(success$, failed$);
-          }
-          // return EMPTY;
-        })
-      ).subscribe();
+  /**
+   * Should only be enabled for the host, but all players will be redirected, so it's fine
+   */
+  private hostStepProcessing() {
+    this.players$
+    .pipe(
+      takeUntil(this.unsub$),
+      tap((players) => {
+        if (players.every(p => p.step.step === STEP_CHECK_IN_GAME.step && p.step.done)) {
+          // all players are ready for the game
+          this.store.dispatch(setPartyStep({ step: STEP_PLAY_GAME }));
+        }
+      })
+    ).subscribe();
   }
 }
