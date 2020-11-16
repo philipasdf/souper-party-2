@@ -84,7 +84,6 @@ export class PlayerEffects {
     setStep$ = this.actions$.pipe(
         ofType(SET_PLAYER_STEP),
         withLatestFrom(this.store.select(selectPartyName)),
-        tap(() => console.log('I WANNA')),
         switchMap(([action, partyName]: [SetPlayerStep, string]) => this.playerFs.setStep(partyName, action.player.name, action.step)),
         map(() => {
             console.log('%c SERVICE: setStep success', 'color: green');

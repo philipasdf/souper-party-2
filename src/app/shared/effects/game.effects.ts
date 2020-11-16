@@ -2,7 +2,6 @@ import { Injectable } from "@angular/core";
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { fstat } from 'fs';
 import { of } from 'rxjs';
 import { catchError, combineAll, exhaustMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import { CreateGame, CREATE_GAME, QueryGames, QUERY_GAMES, success, UPDATE_GAMES } from '../actions/game.actions';
@@ -10,7 +9,6 @@ import { FAILED } from '../actions/game.actions';
 import { SET_PARTY_STEP } from '../actions/party.actions';
 import { GameFsService } from '../firestore-services/game-fs.service';
 import { PartyFsService } from '../firestore-services/party-fs.service';
-import { selectPartyName } from '../reducers/party.reducer';
 import { STEP_CHECK_IN_GAME } from '../steps/steps';
 
 @Injectable()
