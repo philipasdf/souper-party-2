@@ -6,14 +6,14 @@ import { partyReducer } from './party.reducer';
 import { playerReducer, State } from './player.reducer';
 
 export interface AppState {
-    name: string,
-    game: Game,
-    party: Party,
-    player: State
+  name: string;
+  game: Game;
+  party: Party;
+  player: State;
 }
 
 export const appReducers: ActionReducerMap<any> = {
-    player: playerReducer,
-    party: partyReducer,
-    game: gameReducer
-}
+  player: playerReducer,
+  party: partyReducer,
+  game: gameReducer,
+};

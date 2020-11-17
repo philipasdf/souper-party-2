@@ -8,29 +8,24 @@ import { JOIN_PARTY_SUCCESS } from 'src/app/shared/actions/player.actions';
 @Component({
   selector: 'app-launcher-create-or-join',
   templateUrl: './launcher-create-or-join.component.html',
-  styleUrls: ['./launcher-create-or-join.component.css']
+  styleUrls: ['./launcher-create-or-join.component.css'],
 })
 export class LauncherCreateOrJoinComponent implements OnInit, OnDestroy {
-
-  partyNameInput = ''; 
+  partyNameInput = '';
   errorMessage: string;
 
-  constructor(private store: Store, private actions$: Actions, private router: Router) { }
+  constructor(private store: Store, private actions$: Actions, private router: Router) {}
 
   errorMsgs$;
   joinPartySuccess$;
 
   ngOnInit(): void {
-    this.errorMsgs$ = this.actions$
-      .pipe(ofType(FAILED))
-      .subscribe((action: any) => {
-        this.errorMessage = action.errorMessage;
-      });
-    this.joinPartySuccess$ = this.actions$
-      .pipe(ofType(JOIN_PARTY_SUCCESS))
-      .subscribe((action: any) => {
-        this.router.navigateByUrl(`lobby/${action.partyName}/${action.playerFireId}`);
-      });
+    this.errorMsgs$ = this.actions$.pipe(ofType(FAILED)).subscribe((action: any) => {
+      this.errorMessage = action.errorMessage;
+    });
+    this.joinPartySuccess$ = this.actions$.pipe(ofType(JOIN_PARTY_SUCCESS)).subscribe((action: any) => {
+      this.router.navigateByUrl(`lobby/${action.partyName}/${action.playerFireId}`);
+    });
   }
 
   ngOnDestroy() {
@@ -39,10 +34,10 @@ export class LauncherCreateOrJoinComponent implements OnInit, OnDestroy {
   }
 
   create() {
-    this.store.dispatch(createPartyIfNotAlreadyExists( { name: this.partyNameInput.trim() }));
+    this.store.dispatch(createPartyIfNotAlreadyExists({ name: this.partyNameInput.trim() }));
   }
 
   join() {
-    this.store.dispatch(joinPartyIfExists( { name: this.partyNameInput.trim() }));
+    this.store.dispatch(joinPartyIfExists({ name: this.partyNameInput.trim() }));
   }
 }

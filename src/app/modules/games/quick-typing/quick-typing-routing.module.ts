@@ -4,13 +4,15 @@ import { QuickTypingGameComponent } from './quick-typing-game/quick-typing-game.
 import { QuickTypingPreparerComponent } from './quick-typing-preparer/quick-typing-preparer.component';
 
 const routes: Routes = [
-    { path: 'prepare-data/:partyName/:hostFireId/:gameIndex', component: QuickTypingPreparerComponent },
-    { path: ':partyName/:hostFireId', component: QuickTypingGameComponent }
-  ];
-  
-  @NgModule({
-    imports: [RouterModule.forChild(routes)],
-    exports: [RouterModule]
-  })
-  export class QuickTypingRoutingModule { }
-  
+  {
+    path: 'prepare-data/:partyName/:hostFireId/:gameIndex',
+    component: QuickTypingPreparerComponent,
+  },
+  { path: ':partyName/:hostFireId', component: QuickTypingGameComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+})
+export class QuickTypingRoutingModule {}

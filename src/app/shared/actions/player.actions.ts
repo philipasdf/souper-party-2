@@ -9,11 +9,14 @@ export const saveCurrPlayer = createAction(SAVE_CURR_PLAYER, props<{ currPlayer:
 export type SaveCurrPlayer = ReturnType<typeof saveCurrPlayer>;
 
 export const CREATE_PLAYER_IF_NOT_ALREADY_EXISTS = `${PLAYER_TAG} create player if not already exists`;
-export const createPlayerIfNotAlreadyExists = createAction(CREATE_PLAYER_IF_NOT_ALREADY_EXISTS, props<{ party: string, playerName: string }>());
+export const createPlayerIfNotAlreadyExists = createAction(
+  CREATE_PLAYER_IF_NOT_ALREADY_EXISTS,
+  props<{ party: string; playerName: string }>()
+);
 export type CreatePlayerIfNotAlreadyExists = ReturnType<typeof createPlayerIfNotAlreadyExists>;
 
 export const CREATE_PLAYER = `${PLAYER_TAG} create player`;
-export const createPlayer = createAction(CREATE_PLAYER, props<{ partyName: string, player: Player }>());
+export const createPlayer = createAction(CREATE_PLAYER, props<{ partyName: string; player: Player }>());
 export type CreatePlayer = ReturnType<typeof createPlayer>;
 
 export const QUERY_PLAYERS = `${PLAYER_TAG} query collection`;
@@ -27,14 +30,17 @@ export const SUCCESS = `${PLAYER_TAG} success`;
 export const success = createAction(SUCCESS);
 
 export const JOIN_PARTY_SUCCESS = `${PLAYER_TAG} successfully joined party`;
-export const joinPartySuccess = createAction(JOIN_PARTY_SUCCESS, props<{ successMessage: string, partyName: string, playerFireId: string }>());
+export const joinPartySuccess = createAction(
+  JOIN_PARTY_SUCCESS,
+  props<{ successMessage: string; partyName: string; playerFireId: string }>()
+);
 
 /**
  * Step (=States) (maybe more than one action?)
  */
 export const SET_PLAYER_STEP = `${PLAYER_TAG} set step`;
 // export const setStep = createAction(SET_STEP, props<{ playerName: string, step: Step }>());
-export const setPlayerStep = createAction(SET_PLAYER_STEP, props<{ player: Player, step: Step }>());
+export const setPlayerStep = createAction(SET_PLAYER_STEP, props<{ player: Player; step: Step }>());
 export type SetPlayerStep = ReturnType<typeof setPlayerStep>;
 
 export const SET_PLAYER_STEP_SUCCESS = `${PLAYER_TAG} set step success`;

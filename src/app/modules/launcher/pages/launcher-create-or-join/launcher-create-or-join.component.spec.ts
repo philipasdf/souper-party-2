@@ -8,9 +8,8 @@ describe('LauncherCreateOrJoinComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LauncherCreateOrJoinComponent ]
-    })
-    .compileComponents();
+      declarations: [LauncherCreateOrJoinComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

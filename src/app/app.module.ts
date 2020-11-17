@@ -14,7 +14,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { appReducers } from './shared/reducers/app.reducer';
 import { PlayerEffects } from './shared/effects/player.effects';
 import { PartyEffects } from './shared/effects/party.effects';
-import { AngularFirestoreModule } from "@angular/fire/firestore";
+import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { environment } from 'src/environments/environment';
 import { AngularFireModule } from '@angular/fire';
 import { AngularFireStorageModule, BUCKET } from '@angular/fire/storage';
@@ -27,9 +27,7 @@ export function HttpLoaderFactory(http: HttpClient) {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
+  declarations: [AppComponent],
   imports: [
     // angular core modules
     BrowserModule,
@@ -46,30 +44,24 @@ export function HttpLoaderFactory(http: HttpClient) {
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
+        deps: [HttpClient],
       },
-      defaultLanguage: 'de'
+      defaultLanguage: 'de',
     }),
 
     // redux with ngrx
-    EffectsModule.forRoot([
-      PlayerEffects,
-      PartyEffects,
-      GameEffects
-    ]),
+    EffectsModule.forRoot([PlayerEffects, PartyEffects, GameEffects]),
     StoreModule.forRoot(appReducers),
     StoreDevtoolsModule.instrument({
-      maxAge: 25
+      maxAge: 25,
     }),
 
     // firebase, firestore
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule.enablePersistence(),
-    AngularFireStorageModule
+    AngularFireStorageModule,
   ],
-  providers: [
-    { provide: BUCKET, useValue: environment.firebase.storageBucket }
-  ],
-  bootstrap: [AppComponent]
+  providers: [{ provide: BUCKET, useValue: environment.firebase.storageBucket }],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

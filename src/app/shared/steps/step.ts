@@ -1,4 +1,4 @@
 export interface Step {
-    step: string;
-    done: boolean;
+  step: string;
+  done: boolean;
 }

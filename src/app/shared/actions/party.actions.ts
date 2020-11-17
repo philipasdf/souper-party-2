@@ -5,7 +5,10 @@ import { Step } from '../steps/step';
 const PARTY_TAG = '[Party]';
 
 export const CREATE_PARTY_IF_NOT_ALREADY_EXISTS = `${PARTY_TAG} create a new party if not already exists`;
-export const createPartyIfNotAlreadyExists = createAction(CREATE_PARTY_IF_NOT_ALREADY_EXISTS, props<{ name: string }>());
+export const createPartyIfNotAlreadyExists = createAction(
+  CREATE_PARTY_IF_NOT_ALREADY_EXISTS,
+  props<{ name: string }>()
+);
 export type CreatePartyIfNotAlreadyExists = ReturnType<typeof createPartyIfNotAlreadyExists>;
 
 export const JOIN_PARTY_IF_EXISTS = `${PARTY_TAG} join party if it exists`;
@@ -21,7 +24,7 @@ export const queryParty = createAction(QUERY_PARTY, props<{ name: string }>());
 export type QueryParty = ReturnType<typeof queryParty>;
 
 export const UPDATE_PARTY = `${PARTY_TAG} update data`;
-export const updateParty = createAction(UPDATE_PARTY, props<{party: Party }>());
+export const updateParty = createAction(UPDATE_PARTY, props<{ party: Party }>());
 
 export const SUCCESS = `${PARTY_TAG} success`;
 export const success = createAction(SUCCESS, props<{ successMessage: string }>());

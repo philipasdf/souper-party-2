@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { createGame } from 'src/app/shared/actions/game.actions';
@@ -7,25 +7,20 @@ import { GameData } from '../game-data';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
+  constructor(private router: Router, private store: Store) {}
 
-    constructor(private router: Router, private store: Store) {
+  loadGamePreparer(partyName: string, hostFireId: string, gameName: string, gameIndex: number) {
+    this.router.navigate([`${gameName}/prepare-data/${partyName}/${hostFireId}/${gameIndex}`]);
+  }
 
-    }
+  createGame(partyName: string, gameData: GameData<any>, index: number) {
+    const game: Game = {
+      id: gameData.name,
+      index: index,
+      state: 'initial-state',
+      gameData: gameData,
+    };
 
-    loadGamePreparer(partyName: string, hostFireId: string, gameName: string, gameIndex: number) {
-        this.router.navigate([`${gameName}/prepare-data/${partyName}/${hostFireId}/${gameIndex}`]);
-    }
-
-    createGame(partyName: string, gameData: GameData<any>, index: number) {
-
-        const game: Game = {
-            id: gameData.name,
-            index: index,
-            state: 'initial-state',
-            gameData: gameData
-        }
-
-        this.store.dispatch(createGame({ game, partyName }));
-    }
-
+    this.store.dispatch(createGame({ game, partyName }));
+  }
 }

@@ -4,9 +4,7 @@ import { QuickTypingPreparerComponent } from './quick-typing-preparer/quick-typi
 import { QuickTypingGameComponent } from './quick-typing-game/quick-typing-game.component';
 
 @NgModule({
-    imports: [
-        QuickTypingRoutingModule
-    ],
-    declarations: [QuickTypingPreparerComponent, QuickTypingGameComponent]
+  imports: [QuickTypingRoutingModule],
+  declarations: [QuickTypingPreparerComponent, QuickTypingGameComponent],
 })
 export class QuickTypingModule {}

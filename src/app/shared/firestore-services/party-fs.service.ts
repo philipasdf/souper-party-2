@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { from, Observable } from 'rxjs';
 import { PARTY_PATH } from './firestore-paths';
@@ -7,28 +7,27 @@ import { Step } from '../steps/step';
 
 @Injectable({ providedIn: 'root' })
 export class PartyFsService {
+  constructor(private afs: AngularFirestore) {}
 
-    constructor(private afs: AngularFirestore) {}
+  checkIfPartyExists(partyName: string) {
+    return this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).get();
+  }
 
-    checkIfPartyExists(partyName: string) {
-        return this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).get();
-    }
+  createParty(partyName: string, party: Party): Observable<void> {
+    return from(this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).set(party));
+  }
 
-    createParty(partyName: string, party: Party): Observable<void> {
-        return from(this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).set(party));
-    }
+  fetchParty(partyName: string) {
+    return this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).valueChanges();
+  }
 
-    fetchParty(partyName: string) {
-        return this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`).valueChanges();
-    }
+  setStep(partyName: string, step: Step) {
+    const ref = this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`);
+    return from(ref.update({ step }));
+  }
 
-    setStep(partyName: string, step: Step) {
-        const ref = this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`);
-        return from(ref.update({ step }));
-    }
-
-    setCurrGameFireId(partyName: string, currGameIndex: number) {
-        const ref = this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`);
-        return from(ref.update({ currGameIndex }));
-    }
+  setCurrGameFireId(partyName: string, currGameIndex: number) {
+    const ref = this.afs.doc<Party>(`${PARTY_PATH}/${partyName}`);
+    return from(ref.update({ currGameIndex }));
+  }
 }

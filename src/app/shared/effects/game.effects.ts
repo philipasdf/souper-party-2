@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -13,37 +13,35 @@ import { STEP_CHECK_IN_GAME } from '../steps/steps';
 
 @Injectable()
 export class GameEffects {
+  constructor(
+    private actions$: Actions,
+    private gameFs: GameFsService,
+    private partyFs: PartyFsService,
+    private translate: TranslateService,
+    private store: Store
+  ) {}
 
-    constructor(private actions$: Actions, 
-                private gameFs: GameFsService, 
-                private partyFs: PartyFsService, 
-                private translate: TranslateService, 
-                private store: Store) {}
+  @Effect()
+  createGame$ = this.actions$.pipe(
+    ofType(CREATE_GAME),
+    switchMap((action: CreateGame) => {
+      return this.partyFs.setCurrGameFireId(action.partyName, action.game.index).pipe(
+        map(() => this.gameFs.addGame(action.partyName, action.game)),
+        combineAll()
+      );
+    }),
+    map(() => {
+      const successMessage = this.translate.instant('success.game.created', { id: 'todoremove' });
+      this.store.dispatch(success(successMessage));
+      return { type: SET_PARTY_STEP, step: STEP_CHECK_IN_GAME };
+    }),
+    catchError((err) => of({ type: FAILED, errorMessage: 'Failed to create a game in firestore' }))
+  );
 
-    @Effect()
-    createGame$ = this.actions$.pipe(
-        ofType(CREATE_GAME),
-        switchMap((action: CreateGame) => {
-            return this.partyFs
-                .setCurrGameFireId(action.partyName, action.game.index)
-                .pipe(
-                    map(() => this.gameFs.addGame(action.partyName, action.game)),
-                    combineAll()
-                );
-        }),
-        map(() => {
-            const successMessage = this.translate.instant('success.game.created', { id: 'todoremove' });
-            this.store.dispatch(success(successMessage));
-            return ({ type: SET_PARTY_STEP, step: STEP_CHECK_IN_GAME });
-        }),
-        catchError(err => of({ type: FAILED, errorMessage: 'Failed to create a game in firestore'}))
-    );
-
-    @Effect()
-    query$ = this.actions$.pipe(
-        ofType(QUERY_GAMES),
-        exhaustMap((action: QueryGames) => this.gameFs.fetchGames(action.partyName)),
-        map((col) => ({ type: UPDATE_GAMES, games: col }))
-    );
-    
+  @Effect()
+  query$ = this.actions$.pipe(
+    ofType(QUERY_GAMES),
+    exhaustMap((action: QueryGames) => this.gameFs.fetchGames(action.partyName)),
+    map((col) => ({ type: UPDATE_GAMES, games: col }))
+  );
 }
