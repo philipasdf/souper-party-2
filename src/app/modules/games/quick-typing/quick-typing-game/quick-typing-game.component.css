@@ -1,0 +1,29 @@
+span {
+  font-weight: bold;
+}
+
+textarea {
+  width: 100%;
+}
+
+.correct {
+  color: green;
+}
+
+.wrong {
+  color: red;
+}
+
+::-webkit-input-placeholder {
+  /* Edge */
+  color: black;
+}
+
+:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: black;
+}
+
+::placeholder {
+  color: black;
+}

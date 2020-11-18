@@ -24,5 +24,6 @@
     "error.player.alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",
     "error.player.joinPartyFailed": "Party konnte nicht beigetreten werden",
     "game.quick-typing.name": "Schnellfinger",
-    "game.quick-typing.instructions": "Tippe den vorgegebenen Text so schnell es geht ab! Für jeden richtigen Buchstaben gibt es einen Punkt. Vertippst du dich, gibt es Punktabzug. Achte auf deine eingestellte <b>Autokorrektur</b>! 😜"
+    "game.quick-typing.instructions": "Tippe den vorgegebenen Text so schnell es geht ab! Für jeden richtigen Buchstaben gibt es einen Punkt. Vertippst du dich, gibt es Punktabzug. Achte auf deine eingestellte <b>Autokorrektur</b>! 😜",
+    "game.quick-typing.placeholder": "Tippe hier..."
 }

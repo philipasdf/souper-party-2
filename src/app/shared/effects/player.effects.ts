@@ -1,32 +1,32 @@
 import { Injectable } from '@angular/core';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable, of } from 'rxjs';
+import { catchError, exhaustMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
 import {
-  CREATE_PLAYER,
-  CREATE_PLAYER_IF_NOT_ALREADY_EXISTS,
-  SAVE_CURR_PLAYER,
-  JOIN_PARTY_SUCCESS,
-  SUCCESS,
-  QUERY_PLAYERS,
-  UPDATE_PLAYERS,
   CreatePlayer,
   CreatePlayerIfNotAlreadyExists,
+  CREATE_PLAYER,
+  CREATE_PLAYER_IF_NOT_ALREADY_EXISTS,
+  JOIN_PARTY_SUCCESS,
   QueryPlayers,
+  QUERY_PLAYERS,
   SaveCurrPlayer,
-  SET_PLAYER_STEP,
+  SAVE_CURR_PLAYER,
   SetPlayerStep,
+  SET_PLAYER_STEP,
   SET_PLAYER_STEP_SUCCESS,
+  SUCCESS,
+  UPDATE_PLAYERS,
+  FAILED,
 } from '../actions/player.actions';
-import { catchError, exhaust, exhaustMap, map, switchMap, tap, withLatestFrom } from 'rxjs/operators';
-import { CURR_PLAYER_KEY } from '../local-storage-keys';
-import { TranslateService } from '@ngx-translate/core';
-import { FAILED } from '../actions/party.actions';
 import { PlayerFsService } from '../firestore-services/player-fs.service';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { CURR_PLAYER_KEY } from '../local-storage-keys';
 import { Player } from '../models/player.model';
-import { IDLE } from '../steps/steps';
 import { selectPartyName } from '../reducers/party.reducer';
+import { IDLE } from '../steps/steps';
 
 @Injectable()
 export class PlayerEffects {

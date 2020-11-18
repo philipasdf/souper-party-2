@@ -24,5 +24,6 @@
     "error.player.alreadyExists": "player '{{ nickname }}' already exists in the party '{{ partyName }}'. Please go back and choose another nickname.",
     "error.player.joinPartyFailed": "failed to join party",
     "game.quick-typing.name": "Quick Typing",
-    "game.quick-typing.instructions": ""
+    "game.quick-typing.instructions": "",
+    "game.quick-typing.placeholder": ""
 }

@@ -20,14 +20,13 @@ const reducer = createReducer(
 );
 
 export function partyReducer(state: Party | undefined, action: Action) {
-  // console.log(`${action.type} state`, state);
-  // console.log(`${action.type} payload`, action);
+  // console.log(`${action.type}`, state, action);
   return reducer(state, action);
 }
 
 export const selectFeature = createFeatureSelector<Party>('party');
 export const selectParty = createSelector(selectFeature, (state) => state);
-export const selectPartyName = createSelector(selectFeature, (state) => state.name);
-export const selectPartyHost = createSelector(selectFeature, (state) => state.host);
-export const selectPartyStep = createSelector(selectFeature, (state) => state.step);
-export const selectCurrGameIndex = createSelector(selectFeature, (state) => state.currGameIndex);
+export const selectPartyName = createSelector(selectFeature, (state) => state?.name);
+export const selectPartyHost = createSelector(selectFeature, (state) => state?.host);
+export const selectPartyStep = createSelector(selectFeature, (state) => state?.step);
+export const selectCurrGameIndex = createSelector(selectFeature, (state) => state?.currGameIndex);
