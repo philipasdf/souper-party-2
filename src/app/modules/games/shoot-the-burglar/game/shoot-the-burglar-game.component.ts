@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { queryGames } from 'src/app/shared/actions/game.actions';
@@ -6,21 +6,18 @@ import { queryParty } from 'src/app/shared/actions/party.actions';
 import { queryPlayers } from 'src/app/shared/actions/player.actions';
 import { selectCurrGame } from 'src/app/shared/reducers/game.reducer';
 import { GameCountdownService } from '../../game-countdown/game-countdown.service';
-import { QuickTypingData } from '../quick-typing-data';
+import { ShootTheBurglarData } from '../shoot-the-burglar-data';
 
 @Component({
-  selector: 'app-quick-typing-game',
-  templateUrl: './quick-typing-game.component.html',
-  styleUrls: ['./quick-typing-game.component.css'],
+  selector: 'app-shoot-the-burglar-game',
+  templateUrl: './shoot-the-burglar-game.component.html',
+  styleUrls: ['./shoot-the-burglar-game.component.css'],
+  host: {
+    '(document:click)': 'onClick($event)',
+  },
 })
-export class QuickTypingGameComponent implements OnInit {
-  data: QuickTypingData;
-  text: any[] = [];
-  typedText: string;
-  score = 0;
-  EMPTY = '';
-  CORRECT = 'correct';
-  WRONG = 'wrong';
+export class ShootTheBurglarGameComponent implements OnInit {
+  data: ShootTheBurglarData;
 
   constructor(private route: ActivatedRoute, private store: Store, private countdown: GameCountdownService) {}
 
@@ -37,23 +34,12 @@ export class QuickTypingGameComponent implements OnInit {
       console.log(game);
       this.data = game?.gameData?.data;
       if (this.data) {
-        this.text = Array.from(this.data.textToType).map((t) => ({ char: t, status: this.EMPTY }));
+        // TODO
       }
     });
   }
 
-  onTextInput(input) {
-    const inputArray = Array.from(input);
-
-    for (let i = 0; i < inputArray.length; i++) {
-      const isCorrect = this.text[i].char === inputArray[i];
-      this.text[i].status = isCorrect ? this.CORRECT : this.WRONG;
-    }
-  }
-
-  calculateScore() {
-    const corrects = this.text.filter((t) => t.status === this.CORRECT).length;
-    const wrongs = this.text.filter((t) => t.status === this.WRONG).length;
-    this.score = corrects - wrongs;
+  onClick(event) {
+    console.log(event);
   }
 }
