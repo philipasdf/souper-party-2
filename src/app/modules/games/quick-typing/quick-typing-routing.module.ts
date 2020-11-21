@@ -8,7 +8,7 @@ const routes: Routes = [
     path: 'prepare-data/:partyName/:hostFireId/:gameIndex',
     component: QuickTypingPreparerComponent,
   },
-  { path: ':partyName/:hostFireId', component: QuickTypingGameComponent },
+  { path: ':partyName/:playerFireId', component: QuickTypingGameComponent },
 ];
 
 @NgModule({

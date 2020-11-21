@@ -35,6 +35,9 @@ export const joinPartySuccess = createAction(
   props<{ successMessage: string; partyName: string; playerFireId: string }>()
 );
 
+export const FAILED = `${PLAYER_TAG} failed`;
+export const failed = createAction(FAILED, props<{ errorMessage: string }>());
+
 /**
  * Step (=States) (maybe more than one action?)
  */

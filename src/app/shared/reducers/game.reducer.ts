@@ -20,6 +20,6 @@ export function gameReducer(state: State | undefined, action: Action) {
 // Selectors
 export const selectFeature = createFeatureSelector<State>('game');
 export const { selectAll } = adapter.getSelectors(selectFeature);
-export const selectCurrGame = createSelector(selectFeature, selectCurrGameIndex, (games, currGameIndex) => {
-  return Object.values(games.entities).find((g) => g.index === currGameIndex);
-});
+export const selectCurrGame = createSelector(selectFeature, selectCurrGameIndex, (games, currGameIndex) =>
+  Object.values(games.entities).find((g) => g.index === currGameIndex)
+);
