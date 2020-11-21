@@ -21,13 +21,14 @@ import { AngularFireStorageModule, BUCKET } from '@angular/fire/storage';
 import { LobbyModule } from './modules/lobby/lobby.module';
 import { GamesRoutingModule } from './modules/games/games-routing.module';
 import { GameEffects } from './shared/effects/game.effects';
+import { GameCountdownComponent } from './modules/games/game-countdown/game-countdown.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, GameCountdownComponent],
   imports: [
     // angular core modules
     BrowserModule,

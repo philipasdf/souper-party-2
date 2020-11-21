@@ -5,6 +5,7 @@ import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
 import { queryPlayers } from 'src/app/shared/actions/player.actions';
 import { selectCurrGame } from 'src/app/shared/reducers/game.reducer';
+import { GameCountdownService } from '../../game-countdown/game-countdown.service';
 import { QuickTypingData } from '../quick-typing-data';
 
 @Component({
@@ -21,9 +22,11 @@ export class QuickTypingGameComponent implements OnInit {
   CORRECT = 'correct';
   WRONG = 'wrong';
 
-  constructor(private route: ActivatedRoute, private store: Store) {}
+  constructor(private route: ActivatedRoute, private store: Store, private countdown: GameCountdownService) {}
 
   ngOnInit() {
+    this.countdown.startCountdown();
+
     const partyName = this.route.snapshot.params['partyName'];
     const playerFireId = this.route.snapshot.params['playerFireId'];
     this.store.dispatch(queryParty({ name: partyName }));
