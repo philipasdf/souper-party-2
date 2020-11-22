@@ -3,12 +3,14 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { validateEventsArray } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { combineLatest, Subject, timer } from 'rxjs';
+import { combineLatest, Observable, Subject, timer } from 'rxjs';
 import { filter, timeInterval, timeout, timestamp } from 'rxjs/operators';
 import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
 import { queryPlayers } from 'src/app/shared/actions/player.actions';
+import { Player } from 'src/app/shared/models/player.model';
 import { selectCurrGame } from 'src/app/shared/reducers/game.reducer';
+import { selectAll } from 'src/app/shared/reducers/player.reducer';
 import { GameCountdownService } from '../../game-countdown/game-countdown.service';
 import { ShootTheBurglarData } from '../shoot-the-burglar-data';
 
@@ -21,10 +23,13 @@ import { ShootTheBurglarData } from '../shoot-the-burglar-data';
   },
 })
 export class ShootTheBurglarGameComponent implements OnInit {
-  countdownEnded$ = new Subject();
   data: ShootTheBurglarData;
-  currRound = 1;
+
+  countdownEnded$ = new Subject();
   shots$ = new Subject();
+  players$: Observable<Player[]>;
+
+  currRound = 1;
   revealed = '';
   shotTime: number;
   score = 0;
@@ -44,6 +49,7 @@ export class ShootTheBurglarGameComponent implements OnInit {
     this.store.dispatch(queryGames({ partyName })); // TODO query only one game
 
     const game$ = this.store.select(selectCurrGame);
+    this.players$ = this.store.select(selectAll);
 
     combineLatest(game$, this.countdownEnded$)
       .pipe(filter(([game, countdownEnded]) => !!game && !!countdownEnded))
