@@ -3,8 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'quick-typing',
-    loadChildren: () => import('../../modules/games/quick-typing/quick-typing.module').then((m) => m.QuickTypingModule),
+    path: 'shoot-the-burglar',
+    loadChildren: () => import('./shoot-the-burglar/shoot-the-burglar.module').then((m) => m.ShootTheBurglar),
   },
 ];
 

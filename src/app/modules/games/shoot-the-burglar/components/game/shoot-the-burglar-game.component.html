@@ -1,0 +1,13 @@
+<h1>
+    {{ revealed }}
+</h1>
+
+<div *ngIf="players">
+    <p *ngFor="let p of players">
+        {{p.name}}
+        <span *ngFor="let l of [].constructor(getLifepoints(p.fireId))">💚</span>
+        <span *ngFor="let l of [].constructor(getScore(p.fireId))">💀</span>
+    </p>
+</div>
+
+<!-- 🔫💥 -->

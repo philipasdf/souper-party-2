@@ -6,15 +6,19 @@ import { Subscription } from 'rxjs';
 import { SUCCESS } from 'src/app/shared/actions/game.actions';
 import { updateParty } from 'src/app/shared/actions/party.actions';
 import { Party } from 'src/app/shared/models/party.model';
-import { GameData } from '../../game-data';
-import { GameService } from '../../services/game.service';
-import { QuickTypingData } from '../quick-typing-data';
+import { GameData } from '../../../game-data';
+import { GameService } from '../../../services/game.service';
+import { ShootTheBurglarData, ShootTheBurglarRound } from '../../shoot-the-burglar-data';
 
 @Component({
-  selector: 'app-quick-typing-preparer',
-  templateUrl: './quick-typing-preparer.component.html',
+  selector: 'app-shoot-the-burglar-preparer',
+  templateUrl: './shoot-the-burglar-preparer.component.html',
 })
-export class QuickTypingPreparerComponent implements OnInit, OnDestroy {
+export class ShootTheBurglarPreparerComponent implements OnInit, OnDestroy {
+  MIN_REVEAL_TIME = 250;
+  MAX_REVEAL_TIME = 2750;
+  MAX_STAY_TIME = 2000;
+  MIN_STAY_TIME = 500;
   gameSuccess$: Subscription;
 
   constructor(
@@ -25,6 +29,10 @@ export class QuickTypingPreparerComponent implements OnInit, OnDestroy {
     private router: Router
   ) {}
 
+  ngOnDestroy() {
+    this.gameSuccess$.unsubscribe();
+  }
+
   ngOnInit(): void {
     const partyName = this.route.snapshot.params['partyName'];
     const hostFireId = this.route.snapshot.params['hostFireId'];
@@ -33,11 +41,10 @@ export class QuickTypingPreparerComponent implements OnInit, OnDestroy {
     const party: Party = { name: partyName, host: '', hostFireId: hostFireId };
     this.store.dispatch(updateParty({ party }));
 
-    const gameData: GameData<QuickTypingData> = {
-      name: 'quick-typing',
+    const gameData: GameData<ShootTheBurglarData> = {
+      name: 'shoot-the-burglar',
       data: {
-        textToType:
-          'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+        rounds: this.initRounds(5),
       },
     };
 
@@ -49,7 +56,23 @@ export class QuickTypingPreparerComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.gameSuccess$.unsubscribe();
+  initRounds(numOfRounds: number): ShootTheBurglarRound[] {
+    const rounds = [];
+    for (let i = 0; i < numOfRounds; i++) {
+      rounds.push({
+        reveal: this.getRndReveal(['burglar', 'princess']),
+        timeUntilReveal: this.getRndTime(this.MIN_REVEAL_TIME, this.MAX_REVEAL_TIME),
+        stayTime: this.getRndTime(this.MIN_STAY_TIME, this.MAX_STAY_TIME),
+      });
+    }
+    return rounds;
+  }
+
+  private getRndReveal(reveals: any[]): string {
+    return reveals[Math.floor(Math.random() * reveals.length)];
+  }
+
+  private getRndTime(min: number, max: number) {
+    return Math.floor(Math.random() * max) + min;
   }
 }

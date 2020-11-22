@@ -1,9 +1,0 @@
-<div>
-    <span *ngFor="let t of text" [ngClass]="{'correct': t.status === CORRECT, 'wrong': t.status === WRONG }">{{t.char}}</span>
-</div>
-
-<textarea [placeholder]="'game.quick-typing.placeholder' | translate" [(ngModel)]="typedText" (ngModelChange)="onTextInput($event); calculateScore()">
-
-</textarea>
-
-{{score}}

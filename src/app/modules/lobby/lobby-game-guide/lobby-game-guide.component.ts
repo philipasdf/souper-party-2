@@ -88,7 +88,7 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
             this.checkedIn = playerStep.done;
           }
           if (playerStep.step === STEP_PLAY_GAME.step && !playerStep.done) {
-            this.router.navigate([`/${currGame.id}/${this.partyName}/${this.playerFireId}`], {
+            this.router.navigate([`/${currGame.id}/${this.partyName}/${currGame.index}/${this.playerFireId}`], {
               relativeTo: this.route,
             });
           }

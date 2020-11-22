@@ -45,7 +45,7 @@ export class LobbyHomeComponent extends LobbyParentComponent implements OnInit {
 
   onStartGame() {
     const gameIndex = 0; // TODO games.length oder so
-    this.gameService.loadGamePreparer(this.partyName, this.playerFireId, 'quick-typing', gameIndex);
+    this.gameService.loadGamePreparer(this.partyName, this.playerFireId, 'shoot-the-burglar', gameIndex);
   }
 
   private initDisplayData() {
