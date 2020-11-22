@@ -8,13 +8,17 @@ import { updateParty } from 'src/app/shared/actions/party.actions';
 import { Party } from 'src/app/shared/models/party.model';
 import { GameData } from '../../../game-data';
 import { GameService } from '../../../services/game.service';
-import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
+import { ShootTheBurglarData, ShootTheBurglarRound } from '../../shoot-the-burglar-data';
 
 @Component({
   selector: 'app-shoot-the-burglar-preparer',
   templateUrl: './shoot-the-burglar-preparer.component.html',
 })
 export class ShootTheBurglarPreparerComponent implements OnInit, OnDestroy {
+  MIN_REVEAL_TIME = 250;
+  MAX_REVEAL_TIME = 2750;
+  MAX_STAY_TIME = 2000;
+  MIN_STAY_TIME = 500;
   gameSuccess$: Subscription;
 
   constructor(
@@ -24,6 +28,10 @@ export class ShootTheBurglarPreparerComponent implements OnInit, OnDestroy {
     private actions$: Actions,
     private router: Router
   ) {}
+
+  ngOnDestroy() {
+    this.gameSuccess$.unsubscribe();
+  }
 
   ngOnInit(): void {
     const partyName = this.route.snapshot.params['partyName'];
@@ -36,33 +44,7 @@ export class ShootTheBurglarPreparerComponent implements OnInit, OnDestroy {
     const gameData: GameData<ShootTheBurglarData> = {
       name: 'shoot-the-burglar',
       data: {
-        textToType: '',
-        rounds: [
-          {
-            reveal: 'burglar',
-            timeUntilReveal: 1000,
-          },
-          {
-            reveal: 'princess',
-            timeUntilReveal: 2300,
-          },
-          {
-            reveal: 'burglar',
-            timeUntilReveal: 3000,
-          },
-          {
-            reveal: 'princess',
-            timeUntilReveal: 2000,
-          },
-          {
-            reveal: 'princess',
-            timeUntilReveal: 500,
-          },
-          {
-            reveal: 'burglar',
-            timeUntilReveal: 4000,
-          },
-        ],
+        rounds: this.initRounds(5),
       },
     };
 
@@ -74,7 +56,23 @@ export class ShootTheBurglarPreparerComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
-    this.gameSuccess$.unsubscribe();
+  initRounds(numOfRounds: number): ShootTheBurglarRound[] {
+    const rounds = [];
+    for (let i = 0; i < numOfRounds; i++) {
+      rounds.push({
+        reveal: this.getRndReveal(['burglar', 'princess']),
+        timeUntilReveal: this.getRndTime(this.MIN_REVEAL_TIME, this.MAX_REVEAL_TIME),
+        stayTime: this.getRndTime(this.MIN_STAY_TIME, this.MAX_STAY_TIME),
+      });
+    }
+    return rounds;
+  }
+
+  private getRndReveal(reveals: any[]): string {
+    return reveals[Math.floor(Math.random() * reveals.length)];
+  }
+
+  private getRndTime(min: number, max: number) {
+    return Math.floor(Math.random() * max) + min;
   }
 }
