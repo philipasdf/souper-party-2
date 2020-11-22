@@ -1,18 +1,21 @@
-import { hostViewClassName } from '@angular/compiler';
-import { Component, HostListener, OnInit } from '@angular/core';
-import { validateEventsArray } from '@angular/fire/firestore';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable, Subject, timer } from 'rxjs';
-import { filter, timeInterval, timeout, timestamp } from 'rxjs/operators';
+import { filter, takeUntil, timestamp } from 'rxjs/operators';
 import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
 import { queryPlayers } from 'src/app/shared/actions/player.actions';
 import { Player } from 'src/app/shared/models/player.model';
 import { selectCurrGame } from 'src/app/shared/reducers/game.reducer';
-import { selectAll } from 'src/app/shared/reducers/player.reducer';
-import { GameCountdownService } from '../../game-countdown/game-countdown.service';
-import { ShootTheBurglarData } from '../shoot-the-burglar-data';
+import { GameCountdownService } from '../../../game-countdown/game-countdown.service';
+import { addShot, queryShots } from '../../actions/shot.actions';
+import { Shot } from '../../models/shot.model';
+import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
+import * as players from 'src/app/shared/reducers/player.reducer';
+import * as shots from 'src/app/modules/games/shoot-the-burglar/reducers/shot.reducer';
+import { UnsubscribingComponent } from 'src/app/shared/components/unsubscribing/unsubscribing.component';
+import { ShootTheBurglarService } from './shoot-the-burglar.service';
 
 @Component({
   selector: 'app-shoot-the-burglar-game',
@@ -22,93 +25,126 @@ import { ShootTheBurglarData } from '../shoot-the-burglar-data';
     '(document:click)': 'onClick($event)',
   },
 })
-export class ShootTheBurglarGameComponent implements OnInit {
+export class ShootTheBurglarGameComponent extends UnsubscribingComponent implements OnInit {
+  playerFireId: string;
+
+  gameFireId: string;
   data: ShootTheBurglarData;
 
   countdownEnded$ = new Subject();
-  shots$ = new Subject();
-  players$: Observable<Player[]>;
+  triggerShot$ = new Subject();
+  players: Player[];
+  playerScores: { fireId: string }[] = []; // score: if you shot a burglar first, you earn one score
 
   currRound = 1;
   revealed = '';
-  shotTime: number;
-  score = 0;
-  life = 3;
+  scoresMap: Map<string, number>;
+  lifepointsMap: Map<string, number>;
   revealedTimestamp: number;
 
-  constructor(private route: ActivatedRoute, private store: Store, private countdown: GameCountdownService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private store: Store,
+    private countdown: GameCountdownService,
+    private shootTheBurglar: ShootTheBurglarService
+  ) {
+    super();
+  }
 
   ngOnInit() {
     const componentRef = this.countdown.startCountdown();
     componentRef.onDestroy(() => this.countdownEnded$.next(true));
 
     const partyName = this.route.snapshot.params['partyName'];
-    const playerFireId = this.route.snapshot.params['playerFireId'];
+    const gameFireId = this.route.snapshot.params['gameFireId'];
+    this.playerFireId = this.route.snapshot.params['playerFireId'];
     this.store.dispatch(queryParty({ name: partyName }));
     this.store.dispatch(queryPlayers({ party: partyName }));
-    this.store.dispatch(queryGames({ partyName })); // TODO query only one game
+    this.store.dispatch(queryGames({ partyName }));
+    this.store.dispatch(queryShots({ partyName, gameFireId }));
+
+    this.store
+      .select(players.selectAll)
+      .pipe(takeUntil(this.unsub$))
+      .subscribe((players) => (this.players = players));
 
     const game$ = this.store.select(selectCurrGame);
-    this.players$ = this.store.select(selectAll);
-
     combineLatest(game$, this.countdownEnded$)
       .pipe(filter(([game, countdownEnded]) => !!game && !!countdownEnded))
       .subscribe(([game, _]) => {
+        this.gameFireId = `${game?.index}`;
         this.data = game?.gameData?.data;
-        this.startGame();
-        this.playRound();
+        this.revealBurglarsAndPrincesses();
       });
 
-    this.shots$
-      .pipe(timestamp())
-      .subscribe((shot) => (this.shotTime = this.revealedTimestamp ? shot.timestamp - this.revealedTimestamp : null));
-  }
-
-  startGame() {}
-
-  async playRound() {
-    const round = this.data.rounds[this.currRound - 1];
-    // reset data
-    this.shotTime = null;
-    this.revealed = '';
-
-    await timer(round.timeUntilReveal).toPromise();
-    this.revealedTimestamp = new Date().getTime();
-    this.revealed = round.reveal;
-
-    await timer(2000).toPromise();
-    console.log('timeout!');
-    this.calculateScore(round.reveal, this.shotTime);
+    this.processTriggers();
+    this.processShots();
   }
 
   onClick(event) {
-    this.shots$.next();
+    this.triggerShot$.next();
   }
 
-  private calculateScore(revealed: string, shotTime?: number) {
-    if (shotTime && revealed === 'burglar') {
-      // TODO who was the fastest?
-      // fire actions
-      this.score++;
-    }
+  async revealBurglarsAndPrincesses() {
+    while (this.currRound <= this.data.rounds.length) {
+      this.revealed = '';
+      const round = this.data.rounds[this.currRound - 1];
 
-    if (shotTime && revealed === 'princess') {
-      // update player life--
-      this.life--;
-    }
+      await timer(round.timeUntilReveal).toPromise();
+      this.revealedTimestamp = new Date().getTime();
+      this.revealed = round.reveal;
 
-    timer(2000)
-      .toPromise()
-      .then(() => this.nextRoundOrGameOver());
+      await timer(1500).toPromise();
+      this.currRound++;
+    }
+    this.gameOver();
   }
 
-  nextRoundOrGameOver() {
-    // TODO update round
-    this.currRound++;
-    if (this.currRound > this.data.rounds.length) {
-      console.log('game over');
-    } else {
-      this.playRound();
-    }
+  gameOver() {
+    console.log('game over');
+    // update player step
+    // host observes all players steps and processes further
+  }
+
+  private processTriggers() {
+    this.triggerShot$.pipe(timestamp()).subscribe((trigger) => {
+      const shot: Shot = {
+        id: `${this.playerFireId}-${trigger.timestamp}`,
+        shotTime: this.revealedTimestamp ? trigger.timestamp - this.revealedTimestamp : null,
+        target: this.revealed,
+        targetIndex: this.currRound,
+        timestamp: trigger.timestamp,
+        userFireId: this.playerFireId,
+      };
+
+      this.store.dispatch(addShot({ gameFireId: this.gameFireId, shot }));
+    });
+  }
+
+  private processShots() {
+    this.store
+      .select(shots.selectAll)
+      .pipe(
+        takeUntil(this.unsub$),
+        filter((shots) => !!shots && shots.length > 0)
+      )
+      .subscribe((shots: Shot[]) => {
+        this.scoresMap = this.shootTheBurglar.calculateScores(shots, this.currRound);
+        this.lifepointsMap = this.shootTheBurglar.calculateLifepoints(shots, this.players);
+        this.triggerShotAnimation(shots[shots.length - 1]);
+      });
+  }
+
+  private triggerShotAnimation(shot: Shot) {
+    const name = this.players.find((p) => shot.userFireId === p.fireId).name;
+    console.log(`%c ${name} shots ${shot.targetIndex}-${shot.target} in ${shot.shotTime} ms!`, 'color: red');
+  }
+
+  getScore(playerFireId: string) {
+    return this.shootTheBurglar.getScore(playerFireId, this.scoresMap);
+  }
+
+  getLifepoints(playerFireId: string) {
+    return this.shootTheBurglar.getLifepoints(playerFireId, this.lifepointsMap);
   }
 }

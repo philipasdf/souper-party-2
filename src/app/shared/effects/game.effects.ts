@@ -4,7 +4,16 @@ import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError, combineAll, exhaustMap, map, switchMap, withLatestFrom } from 'rxjs/operators';
-import { CreateGame, CREATE_GAME, QueryGames, QUERY_GAMES, success, UPDATE_GAMES } from '../actions/game.actions';
+import {
+  CreateGame,
+  CREATE_GAME,
+  QueryGame,
+  QueryGames,
+  QUERY_GAME,
+  QUERY_GAMES,
+  success,
+  UPDATE_GAMES,
+} from '../actions/game.actions';
 import { FAILED } from '../actions/game.actions';
 import { SET_PARTY_STEP } from '../actions/party.actions';
 import { GameFsService } from '../firestore-services/game-fs.service';
@@ -26,7 +35,7 @@ export class GameEffects {
     ofType(CREATE_GAME),
     switchMap((action: CreateGame) => {
       return this.partyFs.setCurrGameFireId(action.partyName, action.game.index).pipe(
-        map(() => this.gameFs.addGame(action.partyName, action.game)),
+        map(() => this.gameFs.createGame(action.partyName, action.game)),
         combineAll()
       );
     }),

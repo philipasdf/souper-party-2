@@ -6,9 +6,9 @@ import { Subscription } from 'rxjs';
 import { SUCCESS } from 'src/app/shared/actions/game.actions';
 import { updateParty } from 'src/app/shared/actions/party.actions';
 import { Party } from 'src/app/shared/models/party.model';
-import { GameData } from '../../game-data';
-import { GameService } from '../../services/game.service';
-import { ShootTheBurglarData } from '../shoot-the-burglar-data';
+import { GameData } from '../../../game-data';
+import { GameService } from '../../../services/game.service';
+import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
 
 @Component({
   selector: 'app-shoot-the-burglar-preparer',

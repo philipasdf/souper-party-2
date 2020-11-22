@@ -1,11 +1,20 @@
 import { NgModule } from '@angular/core';
 import { ShootTheBurglarRoutingModule } from './shoot-the-burglar-routing.module';
-import { ShootTheBurglarPreparerComponent } from './preparer/shoot-the-burglar-preparer.component';
+import { ShootTheBurglarPreparerComponent } from './components/preparer/shoot-the-burglar-preparer.component';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { ShootTheBurglarGameComponent } from './game/shoot-the-burglar-game.component';
+import { ShootTheBurglarGameComponent } from './components/game/shoot-the-burglar-game.component';
+import { StoreModule } from '@ngrx/store';
+import { shotReducer } from './reducers/shot.reducer';
+import { EffectsModule } from '@ngrx/effects';
+import { ShotEffects } from './effects/shot.effects';
 
 @NgModule({
-  imports: [SharedModule, ShootTheBurglarRoutingModule],
+  imports: [
+    SharedModule,
+    ShootTheBurglarRoutingModule,
+    StoreModule.forFeature('shot', shotReducer),
+    EffectsModule.forFeature([ShotEffects]),
+  ],
   declarations: [ShootTheBurglarPreparerComponent, ShootTheBurglarGameComponent],
 })
 export class ShootTheBurglar {}

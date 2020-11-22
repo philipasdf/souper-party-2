@@ -1,17 +1,13 @@
 <h1>
     {{ revealed }}
 </h1>
-<h1 *ngIf="shotTime">
-    PEW!! {{shotTime}} ms
-</h1>
 
-<div *ngIf="players$ | async as players">
-    <p>players:</p>
-    <p *ngFor="let p of players">{{p.name}}</p>
+<div *ngIf="players">
+    <p *ngFor="let p of players">
+        {{p.name}}
+        <span *ngFor="let l of [].constructor(getLifepoints(p.fireId))">💚</span>
+        <span *ngFor="let l of [].constructor(getScore(p.fireId))">💀</span>
+    </p>
 </div>
 
-<p>
-    Score: {{ score }}
-</p>
-<p>Life: </p>
-<span *ngFor="let l of [].constructor(life)">💚</span>
+<!-- 🔫💥 -->
