@@ -1,0 +1,12 @@
+<h1>
+    {{ revealed }}
+</h1>
+<h1 *ngIf="shotTime">
+    PEW!! {{shotTime}} ms
+</h1>
+
+<p>
+    Score: {{ score }}
+</p>
+<p>Life: </p>
+<span *ngFor="let l of [].constructor(life)">💚</span>

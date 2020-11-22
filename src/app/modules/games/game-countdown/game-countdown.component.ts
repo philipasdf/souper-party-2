@@ -29,7 +29,6 @@ export class GameCountdownComponent implements OnInit {
         },
         (err) => {},
         () => {
-          console.log('completed');
           this.componentRef.destroy();
         }
       );

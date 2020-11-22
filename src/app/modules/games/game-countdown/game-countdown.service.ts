@@ -17,6 +17,6 @@ export class GameCountdownService {
     componentRef.hostView.detectChanges();
     document.body.appendChild(componentRef.location.nativeElement);
 
-    return componentRef; // TODO start game on destroy in quick typing
+    return componentRef;
   }
 }

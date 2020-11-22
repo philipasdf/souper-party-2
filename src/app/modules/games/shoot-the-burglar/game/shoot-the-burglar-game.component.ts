@@ -1,6 +1,10 @@
+import { hostViewClassName } from '@angular/compiler';
 import { Component, HostListener, OnInit } from '@angular/core';
+import { validateEventsArray } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { combineLatest, Subject, timer } from 'rxjs';
+import { filter, timeInterval, timeout, timestamp } from 'rxjs/operators';
 import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
 import { queryPlayers } from 'src/app/shared/actions/player.actions';
@@ -17,12 +21,21 @@ import { ShootTheBurglarData } from '../shoot-the-burglar-data';
   },
 })
 export class ShootTheBurglarGameComponent implements OnInit {
+  countdownEnded$ = new Subject();
   data: ShootTheBurglarData;
+  currRound = 1;
+  shots$ = new Subject();
+  revealed = '';
+  shotTime: number;
+  score = 0;
+  life = 3;
+  revealedTimestamp: number;
 
   constructor(private route: ActivatedRoute, private store: Store, private countdown: GameCountdownService) {}
 
   ngOnInit() {
-    this.countdown.startCountdown();
+    const componentRef = this.countdown.startCountdown();
+    componentRef.onDestroy(() => this.countdownEnded$.next(true));
 
     const partyName = this.route.snapshot.params['partyName'];
     const playerFireId = this.route.snapshot.params['playerFireId'];
@@ -30,16 +43,66 @@ export class ShootTheBurglarGameComponent implements OnInit {
     this.store.dispatch(queryPlayers({ party: partyName }));
     this.store.dispatch(queryGames({ partyName })); // TODO query only one game
 
-    this.store.select(selectCurrGame).subscribe((game) => {
-      console.log(game);
-      this.data = game?.gameData?.data;
-      if (this.data) {
-        // TODO
-      }
-    });
+    const game$ = this.store.select(selectCurrGame);
+
+    combineLatest(game$, this.countdownEnded$)
+      .pipe(filter(([game, countdownEnded]) => !!game && !!countdownEnded))
+      .subscribe(([game, _]) => {
+        this.data = game?.gameData?.data;
+        this.startGame();
+        this.playRound();
+      });
+
+    this.shots$
+      .pipe(timestamp())
+      .subscribe((shot) => (this.shotTime = this.revealedTimestamp ? shot.timestamp - this.revealedTimestamp : null));
+  }
+
+  startGame() {}
+
+  async playRound() {
+    const round = this.data.rounds[this.currRound - 1];
+    // reset data
+    this.shotTime = null;
+    this.revealed = '';
+
+    await timer(round.timeUntilReveal).toPromise();
+    this.revealedTimestamp = new Date().getTime();
+    this.revealed = round.reveal;
+
+    await timer(2000).toPromise();
+    console.log('timeout!');
+    this.calculateScore(round.reveal, this.shotTime);
   }
 
   onClick(event) {
-    console.log(event);
+    this.shots$.next();
+  }
+
+  private calculateScore(revealed: string, shotTime?: number) {
+    if (shotTime && revealed === 'burglar') {
+      // TODO who was the fastest?
+      // fire actions
+      this.score++;
+    }
+
+    if (shotTime && revealed === 'princess') {
+      // update player life--
+      this.life--;
+    }
+
+    timer(2000)
+      .toPromise()
+      .then(() => this.nextRoundOrGameOver());
+  }
+
+  nextRoundOrGameOver() {
+    // TODO update round
+    this.currRound++;
+    if (this.currRound > this.data.rounds.length) {
+      console.log('game over');
+    } else {
+      this.playRound();
+    }
   }
 }

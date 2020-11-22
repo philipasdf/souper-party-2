@@ -2,5 +2,10 @@ export interface ShootTheBurglarData {
   textToType: string;
   // burglars:
   // princesses:
-  // rounds with flyInTime:
+  rounds: ShootTheBurglarRound[];
+}
+
+export interface ShootTheBurglarRound {
+  reveal: string;
+  timeUntilReveal: number;
 }

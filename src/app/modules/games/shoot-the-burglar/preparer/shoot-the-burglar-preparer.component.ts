@@ -36,8 +36,33 @@ export class ShootTheBurglarPreparerComponent implements OnInit, OnDestroy {
     const gameData: GameData<ShootTheBurglarData> = {
       name: 'shoot-the-burglar',
       data: {
-        textToType:
-          'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+        textToType: '',
+        rounds: [
+          {
+            reveal: 'burglar',
+            timeUntilReveal: 1000,
+          },
+          {
+            reveal: 'princess',
+            timeUntilReveal: 2300,
+          },
+          {
+            reveal: 'burglar',
+            timeUntilReveal: 3000,
+          },
+          {
+            reveal: 'princess',
+            timeUntilReveal: 2000,
+          },
+          {
+            reveal: 'princess',
+            timeUntilReveal: 500,
+          },
+          {
+            reveal: 'burglar',
+            timeUntilReveal: 4000,
+          },
+        ],
       },
     };
 
