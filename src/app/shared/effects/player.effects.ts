@@ -21,11 +21,14 @@ import {
   SUCCESS,
   UPDATE_PLAYERS,
   FAILED,
+  SET_PLAYER_AVATAR,
+  SetPlayerAvatar,
 } from '../actions/player.actions';
 import { PlayerFsService } from '../firestore-services/player-fs.service';
 import { CURR_PLAYER_KEY } from '../local-storage-keys';
 import { Player } from '../models/player.model';
 import { selectPartyName } from '../reducers/party.reducer';
+import { selectCurrPlayerName } from '../reducers/player.reducer';
 import { IDLE } from '../steps/steps';
 
 @Injectable()
@@ -115,5 +118,16 @@ export class PlayerEffects {
       return { type: SET_PLAYER_STEP_SUCCESS };
     }),
     catchError((err) => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateStepFailed') }))
+  );
+
+  @Effect()
+  setPlayerAvatar = this.actions$.pipe(
+    ofType(SET_PLAYER_AVATAR),
+    withLatestFrom(this.store.select(selectPartyName), this.store.select(selectCurrPlayerName)),
+    switchMap(([action, partyName, playerName]: [SetPlayerAvatar, string, string]) => {
+      return this.playerFs.setAvatar(partyName, playerName, action.avatar);
+    }),
+    map(() => ({ type: SUCCESS })),
+    catchError((err) => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateAvatarFailed') }))
   );
 }

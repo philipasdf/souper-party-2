@@ -24,7 +24,7 @@ export class LauncherCreateOrJoinComponent implements OnInit, OnDestroy {
       this.errorMessage = action.errorMessage;
     });
     this.joinPartySuccess$ = this.actions$.pipe(ofType(JOIN_PARTY_SUCCESS)).subscribe((action: any) => {
-      this.router.navigateByUrl(`lobby/${action.partyName}/${action.playerFireId}`);
+      this.router.navigateByUrl(`lobby/${action.partyName}/${action.playerFireId}/avatar-creator`);
     });
   }
 

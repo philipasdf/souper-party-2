@@ -1,16 +1,3 @@
-<svg width="0" height="0">
-    <defs>
-        <clipPath id="heart-clip">
-            <path id="heart" d="M248.078,5.883c-36.691-14.739-77.771-0.839-98.517,31.125C128.817,5.044,87.735-8.856,51.043,5.883 C9.354,22.632-10.863,70.009,5.887,111.696c16.06,39.98,143.314,139.607,143.314,139.607l0.359,0.28l0.36-0.28 c0,0,127.251-99.627,143.314-139.607C309.986,70.009,289.768,22.632,248.078,5.883z"/>
-        </clipPath>
-        <clipPath id="shape-clip">
-            <path id="shape" d="M132.9,0.9c-12.5,1-34.7,4.4-44.9,6.7c-33.5,7.6-55.7,28.2-63.8,58.8c-1.8,6.9-2.2,9.7-2.3,20.1c0,10.5,0.2,13.3,2.3,21.6 c9.5,40.7,33.2,90.2,71.5,149.8c10.5,16.4,14.8,21.8,22.8,29.3c4.3,3.9,8.3,6.8,13,9.2l6.9,3.4h10.9c10.9,0,10.9,0,17-2.9 c7.6-3.7,14.3-8.7,21.4-16.2c6.9-7.2,10.5-12.3,21.9-30.3C248,188.7,272,134.3,277.4,96.6c1.2-8.6,0.5-22.4-1.7-31.3 c-5.6-23.4-20.8-41.2-43.6-50.9c-15.3-6.5-27.5-10-44.5-12.5C177.7,0.5,144.9-0.1,132.9,0.9z"/>
-        </clipPath>
-    </defs>
-</svg>
-
-
-
 
 
 
@@ -21,22 +8,5 @@
 
 <label>{{ 'launcher.home.label' | translate }}</label>
 <input type="text" [placeholder]="'launcher.home.placeholder' | translate" [(ngModel)]="nameInput">
-
-
-<div class="selfie-box">
-    <video playsinline autoplay #video></video>
-    <canvas #canvas></canvas>
-</div>
-<div style="position: relative;">
-    <button (click)="onSnapshot()">snapshot</button>
-</div>
-
-<div>
-    <svg class="snapshot" *ngIf="imgURL">
-        <image [attr.xlink:href]="imgURL" />
-    </svg>
-</div>
-    
-
 
 <button routerLink="createorjoin" (click)="saveUser()" [disabled]="nameInput.trim().length === 0">{{ 'common.next' | translate }}</button>

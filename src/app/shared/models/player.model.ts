@@ -6,4 +6,5 @@ export interface Player {
   fireId: string;
   points: number;
   step: Step;
+  avatar?: string;
 }
