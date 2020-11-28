@@ -1,0 +1,26 @@
+/* 
+.heart image {
+  clip-path: url(#heart-clip);
+}
+.shape image {
+  clip-path: url(#shape-clip);
+} */
+
+.selfie-box {
+  position: relative;
+  height: 300px;
+}
+
+.selfie-box video {
+  position: absolute;
+
+  border: 1px solid orange;
+}
+
+.selfie-box canvas {
+  position: absolute;
+}
+
+.snapshot image {
+  clip-path: url(#heart-clip);
+}
