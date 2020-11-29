@@ -15,7 +15,7 @@
         <tbody>
             <tr *ngFor="let p of data.players" [ngClass]="{'currPlayer' : p.name === data.currPlayerName}">
                 <td>
-                    <app-avatar [imgName]="p.avatar" [size]="50"></app-avatar>
+                    <app-avatar *ngIf="p.avatar" [imgName]="p.avatar" [size]="50"></app-avatar>
                     {{p.name}}
                     <span *ngIf="data.partyHost === p.name">(Host)</span>
                 </td>

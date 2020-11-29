@@ -2,6 +2,8 @@
     {{ revealed }}
 </h1>
 
+<app-avatar *ngIf="revealedImg" [imgName]="revealedImg"></app-avatar>
+
 <div *ngIf="players">
     <p *ngFor="let p of players">
         {{p.name}}

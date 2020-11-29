@@ -6,10 +6,6 @@ import { Observable } from 'rxjs';
 export class ImageFsService {
   constructor(private firestorage: AngularFireStorage) {}
 
-  getAdamSandler(): Observable<string> {
-    return this.firestorage.ref('/adam-sandler.jpg').getDownloadURL();
-  }
-
   getImgURL(imgFileName: string): Observable<string> {
     return this.firestorage.ref(`/avatars/${imgFileName}`).getDownloadURL();
   }

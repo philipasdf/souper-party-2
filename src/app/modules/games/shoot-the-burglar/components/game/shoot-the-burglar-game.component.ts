@@ -38,6 +38,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   currRound = 1;
   revealed = '';
+  revealedImg = null;
   scoresMap: Map<string, number>;
   lifepointsMap: Map<string, number>;
   revealedTimestamp: number;
@@ -74,7 +75,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       .subscribe(([game, _]) => {
         this.gameFireId = `${game?.index}`;
         this.data = game?.gameData?.data;
-        this.revealBurglarsAndPrincesses();
+        // this.revealBurglarsAndPrincesses();
       });
 
     this.processTriggers();
@@ -88,11 +89,13 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   async revealBurglarsAndPrincesses() {
     while (this.currRound <= this.data.rounds.length) {
       this.revealed = '';
+      this.revealedImg = null;
       const round = this.data.rounds[this.currRound - 1];
 
       await timer(round.timeUntilReveal).toPromise();
       this.revealedTimestamp = new Date().getTime();
-      this.revealed = round.reveal;
+      this.revealed = round.reveal.role;
+      this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
       await timer(1500).toPromise();
       this.currRound++;
@@ -100,7 +103,11 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     this.gameOver();
   }
 
-  gameOver() {
+  private getPlayerAvatar(fireId: string): string {
+    return this.players.find((p) => p.fireId === fireId).avatar;
+  }
+
+  private gameOver() {
     console.log('game over');
     // update player step
     // host observes all players steps and processes further

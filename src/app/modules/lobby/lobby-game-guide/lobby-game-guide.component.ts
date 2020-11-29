@@ -119,9 +119,10 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
       .pipe(
         takeUntil(this.unsub$),
         tap((players) => {
+          console.log(players);
           if (players.every((p) => p.step.step === STEP_CHECK_IN_GAME.step && p.step.done)) {
             // all players are ready for the game
-            this.store.dispatch(setPartyStep({ step: STEP_PLAY_GAME }));
+            this.store.dispatch(setPartyStep({ partyName: this.partyName, step: STEP_PLAY_GAME }));
           }
         })
       )

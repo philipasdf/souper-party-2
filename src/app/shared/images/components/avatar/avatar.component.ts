@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { ImageFsService } from '../../firestorage-services/image-fs.service';
 
 @Component({
@@ -6,18 +6,20 @@ import { ImageFsService } from '../../firestorage-services/image-fs.service';
   templateUrl: './avatar.component.html',
   styleUrls: ['./avatar.component.css'],
 })
-export class AvatarComponent implements OnInit {
+export class AvatarComponent implements OnChanges {
   @Input()
   imgName: string;
 
   @Input()
-  size: number;
+  size = 100;
 
   imgUrl$;
 
   constructor(private imageFs: ImageFsService) {}
 
-  ngOnInit(): void {
-    this.imgUrl$ = this.imageFs.getImgURL(this.imgName);
+  ngOnChanges(): void {
+    if (this.imgName !== null && this.imgName !== '') {
+      this.imgUrl$ = this.imageFs.getImgURL(this.imgName);
+    }
   }
 }

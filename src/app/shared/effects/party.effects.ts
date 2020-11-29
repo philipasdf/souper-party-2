@@ -108,7 +108,10 @@ export class PartyEffects {
   setStep$ = this.actions$.pipe(
     ofType(SET_PARTY_STEP),
     withLatestFrom(this.store.select(selectPartyName)),
-    switchMap(([action, partyName]: [SetPartyStep, string]) => this.partyFs.setStep(partyName, action.step)),
+    switchMap(([action, partyName]: [SetPartyStep, string]) => {
+      const _partyName = action.partyName ? action.partyName : partyName;
+      return this.partyFs.setStep(_partyName, action.step);
+    }),
     map(() => ({ type: SET_PARTY_STEP_SUCCESS })),
     catchError((err) => of({ type: FAILED, errorMessage: this.translate.instant('error.party.updateStepFailed') }))
   );
