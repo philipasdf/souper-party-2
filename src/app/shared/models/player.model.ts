@@ -7,4 +7,5 @@ export interface Player {
   points: number;
   step: Step;
   avatar?: string;
+  avatarUrl?: string; // full path for faster loading
 }

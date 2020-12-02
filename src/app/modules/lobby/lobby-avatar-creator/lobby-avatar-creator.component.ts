@@ -79,16 +79,12 @@ export class LobbyAvatarCreatorComponent extends LobbyParentComponent implements
     }, 'image/png');
   }
 
-  onNext() {
+  async onNext() {
     this.isUploading = true;
-    this.images
-      .uploadImg(this.partyName, this.playerFireId, this.currPlayerAvatar)
-      .then((uploadTask) => {
-        this.store.dispatch(setPlayerAvatar({ avatar: uploadTask.metadata.name }));
-        timer(3000)
-          .toPromise()
-          .then(() => (this.isUploading = false));
-      })
-      .catch((err) => (this.isUploading = false));
+    const uploadTask = await this.images.uploadImg(this.partyName, this.playerFireId, this.currPlayerAvatar);
+    const imgUrl = await this.images.getImgURL(uploadTask.metadata.name).toPromise();
+    this.store.dispatch(setPlayerAvatar({ avatar: uploadTask.metadata.name, avatarUrl: imgUrl }));
+    await timer(3000).toPromise();
+    this.isUploading = false;
   }
 }

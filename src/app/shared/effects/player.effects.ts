@@ -125,7 +125,7 @@ export class PlayerEffects {
     ofType(SET_PLAYER_AVATAR),
     withLatestFrom(this.store.select(selectPartyName), this.store.select(selectCurrPlayerName)),
     switchMap(([action, partyName, playerName]: [SetPlayerAvatar, string, string]) => {
-      return this.playerFs.setAvatar(partyName, playerName, action.avatar);
+      return this.playerFs.setAvatar(partyName, playerName, action.avatar, action.avatarUrl);
     }),
     map(() => ({ type: SUCCESS })),
     catchError((err) => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateAvatarFailed') }))
