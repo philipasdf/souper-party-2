@@ -1,8 +1,4 @@
-<h1>
-    {{ revealed }}
-</h1>
-
-<app-avatar *ngIf="revealedImg" [imgName]="revealedImg"></app-avatar>
+<app-revealed *ngIf="revealedImg" [role]="revealed" [imgName]="revealedImg"></app-revealed>
 
 <div *ngIf="players">
     <p *ngFor="let p of players">
@@ -11,5 +7,3 @@
         <span *ngFor="let l of [].constructor(getScore(p.fireId))">💀</span>
     </p>
 </div>
-
-<!-- 🔫💥 -->

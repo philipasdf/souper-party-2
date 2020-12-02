@@ -104,7 +104,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   }
 
   private getPlayerAvatar(fireId: string): string {
-    return this.players.find((p) => p.fireId === fireId).avatar;
+    return this.players.find((p) => p.fireId === fireId).avatarUrl;
   }
 
   private gameOver() {
@@ -142,6 +142,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       });
   }
 
+  // TODO: 🔫💥 Shooting animation
   private triggerShotAnimation(shot: Shot) {
     const name = this.players.find((p) => shot.userFireId === p.fireId).name;
     console.log(`%c ${name} shots ${shot.targetIndex}-${shot.target} in ${shot.shotTime} ms!`, 'color: red');
