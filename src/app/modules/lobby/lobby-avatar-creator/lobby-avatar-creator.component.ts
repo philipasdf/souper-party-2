@@ -36,6 +36,9 @@ export class LobbyAvatarCreatorComponent extends LobbyParentComponent implements
   snapshotHeight;
   snapshotWidth;
 
+  @ViewChild('ellipse')
+  ellipse: ElementRef;
+
   imgURL = null;
   currPlayerAvatar: File = null;
   isUploading = false;
@@ -81,9 +84,6 @@ export class LobbyAvatarCreatorComponent extends LobbyParentComponent implements
     const c = (sourceImage.videoHeight - sourceImage.height) / 2;
     const d = (sourceImage.height - faceTemplate.height) / 2;
     const sourceY = c + d;
-    // const sourceY =
-    // this.faceTemplate.nativeElement.getBoundingClientRect().top -
-    // this.video.nativeElement.getBoundingClientRect().top;
 
     this.canvas.nativeElement
       .getContext('2d')
@@ -99,8 +99,15 @@ export class LobbyAvatarCreatorComponent extends LobbyParentComponent implements
         faceTemplate.height
       );
 
+    const ellipse = this.ellipse.nativeElement;
+    this.renderer.setAttribute(ellipse, 'cx', `${faceTemplate.width / 2}`);
+    this.renderer.setAttribute(ellipse, 'cy', `${faceTemplate.height / 2}`);
+    this.renderer.setAttribute(ellipse, 'rx', `${faceTemplate.width / 2}`);
+    this.renderer.setAttribute(ellipse, 'ry', `${faceTemplate.height / 2}`);
+
     this.snapshotHeight = faceTemplate.height;
     this.snapshotWidth = faceTemplate.width;
+
     this.imgURL = this.canvas.nativeElement.toDataURL('image/jpg');
     this.canvas.nativeElement.toBlob((blob) => {
       this.currPlayerAvatar = new File([blob], 'snapshot.png', { type: 'image/png' });
@@ -110,18 +117,23 @@ export class LobbyAvatarCreatorComponent extends LobbyParentComponent implements
   private updateImageSizes() {
     const totalWidth = Math.round(window.outerWidth);
 
-    this.renderer.setStyle(this.container.nativeElement, 'height', `${totalWidth}px`);
-    this.renderer.setStyle(this.container.nativeElement, 'width', `${totalWidth}px`);
-    this.video.nativeElement.height = totalWidth;
-    this.video.nativeElement.width = totalWidth;
+    const container = this.container.nativeElement;
+    this.renderer.setStyle(container, 'height', `${totalWidth}px`);
+    this.renderer.setStyle(container, 'width', `${totalWidth}px`);
 
-    this.renderer.setStyle(this.faceTemplate.nativeElement, 'height', `${Math.round(totalWidth / 2)}px`);
-    this.renderer.setStyle(this.faceTemplate.nativeElement, 'top', '50%');
-    this.renderer.setStyle(this.faceTemplate.nativeElement, 'left', '50%');
-    this.renderer.setStyle(this.faceTemplate.nativeElement, 'transform', 'translateX(-50%) translateY(-50%)');
+    const video = this.video.nativeElement;
+    this.renderer.setAttribute(video, 'height', `${totalWidth}`);
+    this.renderer.setAttribute(video, 'width', `${totalWidth}`);
 
-    this.canvas.nativeElement.width = this.faceTemplate.nativeElement.width;
-    this.canvas.nativeElement.height = this.faceTemplate.nativeElement.height;
+    const face = this.faceTemplate.nativeElement;
+    this.renderer.setStyle(face, 'height', `${Math.round(totalWidth / 2)}px`);
+    this.renderer.setStyle(face, 'top', '50%');
+    this.renderer.setStyle(face, 'left', '50%');
+    this.renderer.setStyle(face, 'transform', 'translateX(-50%) translateY(-50%)');
+
+    const canvas = this.canvas.nativeElement;
+    this.renderer.setAttribute(canvas, 'width', `${face.width}`);
+    this.renderer.setAttribute(canvas, 'height', `${face.height}`);
   }
 
   async onNext() {

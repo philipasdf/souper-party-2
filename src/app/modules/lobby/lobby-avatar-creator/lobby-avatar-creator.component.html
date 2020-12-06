@@ -1,8 +1,7 @@
 <svg width="0" height="0">
     <defs>
         <clipPath id="face_template">
-            <!-- <path id="Layer 1" class="shp0" d="M151 228.4C106.21 228.4 70 184.95 70 131.2C70 77.45 106.21 34 151 34C195.79 34 232 77.45 232 131.2C232 184.95 195.79 228.4 151 228.4Z" /> -->
-            <path id="Layer 1" class="shp0" d="M125 300C55.88 300 0 232.95 0 150C0 67.05 55.88 0 125 0C194.12 0 250 67.05 250 150C250 232.95 194.12 300 125 300Z" />
+            <ellipse #ellipse/>
         </clipPath>
     </defs>
 </svg>
@@ -23,4 +22,3 @@
 <div [ngStyle]="{'height' : snapshotHeight + 'px', 'width': snapshotWidth + 'px' }">
     <img #snapshot class="snapshot" *ngIf="imgURL" [src]="imgURL">
 </div>
- 

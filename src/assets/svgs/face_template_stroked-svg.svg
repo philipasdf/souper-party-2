@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 300" width="250" height="300">
+	<style>
+		tspan { white-space:pre }
+		.shp0 { fill: none;stroke: #ffff00;stroke-width: 4.4;stroke-dasharray: 18,9 } 
+	</style>
+	<path id="Layer 1" class="shp0" d="M125 300C55.88 300 0 232.95 0 150C0 67.05 55.88 0 125 0C194.12 0 250 67.05 250 150C250 232.95 194.12 300 125 300Z" />
+</svg>

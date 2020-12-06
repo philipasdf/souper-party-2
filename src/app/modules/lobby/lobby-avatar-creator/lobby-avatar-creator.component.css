@@ -27,5 +27,5 @@
 .snapshot {
   width: 100%;
   height: 100%;
-  /* clip-path: url(#face_template); */
+  clip-path: url(#face_template);
 }

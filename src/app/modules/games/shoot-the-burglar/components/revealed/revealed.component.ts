@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, Renderer2, ViewChild } from '@angular/core';
+import {
+  AfterContentInit,
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import { REVEALED_CONFIGS } from './reavealed-configs';
 
 @Component({
@@ -22,10 +32,13 @@ export class RevealedComponent implements OnChanges, AfterViewInit {
   @ViewChild('avatar')
   avatar: ElementRef;
 
+  @ViewChild('avatarEllipse')
+  avatarEllipse: ElementRef;
+
   imgUrl = '';
   stickerUrl = '';
 
-  constructor(private renderer: Renderer2) {}
+  constructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}
 
   ngAfterViewInit() {
     this.updateImageSizes();
@@ -42,19 +55,34 @@ export class RevealedComponent implements OnChanges, AfterViewInit {
     const shuffled = this.shuffleArray(REVEALED_CONFIGS);
     const config = shuffled.find((s) => s.role === this.role);
 
-    this.renderer.setStyle(this.container.nativeElement, 'height', `${totalWidth}px`);
-    this.renderer.setStyle(this.container.nativeElement, 'width', `${totalWidth}px`);
+    const container = this.container.nativeElement;
+    this.renderer.setStyle(container, 'height', `${totalWidth}px`);
+    this.renderer.setStyle(container, 'width', `${totalWidth}px`);
 
-    this.sticker.nativeElement.src = config.src;
-    this.sticker.nativeElement.width = totalWidth * config.sticker.ratioSize;
-    this.renderer.setStyle(this.sticker.nativeElement, 'top', `${totalWidth * config.sticker.ratioTop}px`);
-    this.renderer.setStyle(this.sticker.nativeElement, 'left', `${totalWidth * config.sticker.ratioLeft}px`);
+    const sticker = this.sticker.nativeElement;
+    sticker.src = config.src;
+    sticker.width = totalWidth * config.sticker.ratioSize;
+    this.renderer.setStyle(sticker, 'top', `${totalWidth * config.sticker.ratioTop}px`);
+    this.renderer.setStyle(sticker, 'left', `${totalWidth * config.sticker.ratioLeft}px`);
 
-    this.avatar.nativeElement.height = totalWidth * config.avatar.ratioSize;
-    this.renderer.setStyle(this.avatar.nativeElement, 'top', `${totalWidth * config.avatar.ratioTop}px`);
-    this.renderer.setStyle(this.avatar.nativeElement, 'left', `${totalWidth * config.avatar.ratioLeft}px`);
-    this.renderer.setStyle(this.avatar.nativeElement, 'transform', `rotate(${config.avatar.rotate}deg)`);
-    this.renderer.setStyle(this.avatar.nativeElement, 'z-index', config.avatar.zIndex);
+    // hack calculate ratio of height and width of avatar & totalWidth
+    // ratio of avatar is width="250" height="300" => 250 * 1.2 = 300 => ratio = 1.2
+    const avatarHeight = totalWidth * config.avatar.ratioSize;
+    const avatarWidth = avatarHeight / 1.2;
+
+    const avatar = this.avatar.nativeElement;
+    this.renderer.setStyle(avatar, 'height', `${avatarHeight}px`);
+    this.renderer.setStyle(avatar, 'width', `${avatarWidth}px`);
+    this.renderer.setStyle(avatar, 'top', `${totalWidth * config.avatar.ratioTop}px`);
+    this.renderer.setStyle(avatar, 'left', `${totalWidth * config.avatar.ratioLeft}px`);
+    this.renderer.setStyle(avatar, 'transform', `rotate(${config.avatar.rotate}deg)`);
+    this.renderer.setStyle(avatar, 'z-index', config.avatar.zIndex);
+
+    const ellipse = this.avatarEllipse.nativeElement;
+    this.renderer.setAttribute(ellipse, 'cx', `${avatar.width / 2}`);
+    this.renderer.setAttribute(ellipse, 'cy', `${avatar.height / 2}`);
+    this.renderer.setAttribute(ellipse, 'rx', `${avatar.width / 2}`);
+    this.renderer.setAttribute(ellipse, 'ry', `${avatar.height / 2}`);
   }
 
   private shuffleArray(array: any[]) {
