@@ -75,7 +75,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       .subscribe(([game, _]) => {
         this.gameFireId = `${game?.index}`;
         this.data = game?.gameData?.data;
-        // this.revealBurglarsAndPrincesses();
+        this.revealBurglarsAndPrincesses();
       });
 
     this.processTriggers();
@@ -97,7 +97,8 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       this.revealed = round.reveal.role;
       this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
-      await timer(1500).toPromise();
+      await timer(10000000).toPromise();
+      // await timer(round.stayTime).toPromise();
       this.currRound++;
     }
     this.gameOver();

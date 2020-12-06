@@ -1,13 +1,12 @@
-.princess {
-  position: absolute;
-  height: 166px;
-  left: 128px;
-  top: 17px;
+div {
+  position: relative;
 }
 
-.burglar {
+#avatar {
   position: absolute;
-  height: 243px;
-  left: 114px;
-  top: 75px;
+}
+
+#sticker {
+  position: absolute;
+  z-index: 100;
 }
