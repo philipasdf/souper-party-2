@@ -1,14 +1,3 @@
-<svg width="0" height="0">
-    <defs>
-        <clipPath id="face_template">
-            <ellipse #ellipse/>
-        </clipPath>
-    </defs>
-</svg>
-
-
-
-
 <div #container class="selfie-box">
     <img #faceTemplate id="faceTemplate" src="assets/svgs/face_template_stroked-svg.svg">
     <video #video playsinline autoplay></video>
@@ -20,5 +9,5 @@
 </div>
 
 <div [ngStyle]="{'height' : snapshotHeight + 'px', 'width': snapshotWidth + 'px' }">
-    <img #snapshot class="snapshot" *ngIf="imgURL" [src]="imgURL">
+    <img #snapshot class="snapshot clip-ellipse" *ngIf="imgURL" [src]="imgURL">
 </div>

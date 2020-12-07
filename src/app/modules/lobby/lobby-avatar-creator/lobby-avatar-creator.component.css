@@ -19,13 +19,6 @@
   display: none;
 }
 
-.snapshot image {
-  width: 100%;
-  clip-path: url(#face_template);
-}
-
 .snapshot {
   width: 100%;
-  height: 100%;
-  clip-path: url(#face_template);
 }

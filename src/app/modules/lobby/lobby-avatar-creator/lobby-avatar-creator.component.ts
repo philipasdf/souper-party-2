@@ -36,9 +36,6 @@ export class LobbyAvatarCreatorComponent extends LobbyParentComponent implements
   snapshotHeight;
   snapshotWidth;
 
-  @ViewChild('ellipse')
-  ellipse: ElementRef;
-
   imgURL = null;
   currPlayerAvatar: File = null;
   isUploading = false;
@@ -98,12 +95,6 @@ export class LobbyAvatarCreatorComponent extends LobbyParentComponent implements
         faceTemplate.width,
         faceTemplate.height
       );
-
-    const ellipse = this.ellipse.nativeElement;
-    this.renderer.setAttribute(ellipse, 'cx', `${faceTemplate.width / 2}`);
-    this.renderer.setAttribute(ellipse, 'cy', `${faceTemplate.height / 2}`);
-    this.renderer.setAttribute(ellipse, 'rx', `${faceTemplate.width / 2}`);
-    this.renderer.setAttribute(ellipse, 'ry', `${faceTemplate.height / 2}`);
 
     this.snapshotHeight = faceTemplate.height;
     this.snapshotWidth = faceTemplate.width;

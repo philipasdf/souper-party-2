@@ -32,9 +32,6 @@ export class RevealedComponent implements OnChanges, AfterViewInit {
   @ViewChild('avatar')
   avatar: ElementRef;
 
-  @ViewChild('avatarEllipse')
-  avatarEllipse: ElementRef;
-
   imgUrl = '';
   stickerUrl = '';
 
@@ -77,12 +74,6 @@ export class RevealedComponent implements OnChanges, AfterViewInit {
     this.renderer.setStyle(avatar, 'left', `${totalWidth * config.avatar.ratioLeft}px`);
     this.renderer.setStyle(avatar, 'transform', `rotate(${config.avatar.rotate}deg)`);
     this.renderer.setStyle(avatar, 'z-index', config.avatar.zIndex);
-
-    const ellipse = this.avatarEllipse.nativeElement;
-    this.renderer.setAttribute(ellipse, 'cx', `${avatar.width / 2}`);
-    this.renderer.setAttribute(ellipse, 'cy', `${avatar.height / 2}`);
-    this.renderer.setAttribute(ellipse, 'rx', `${avatar.width / 2}`);
-    this.renderer.setAttribute(ellipse, 'ry', `${avatar.height / 2}`);
   }
 
   private shuffleArray(array: any[]) {

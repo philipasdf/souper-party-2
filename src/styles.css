@@ -5,3 +5,8 @@ body {
 .error {
   color: red;
 }
+
+.clip-ellipse {
+  clip-path: ellipse(50% 50% at center);
+  -webkit-clip-path: ellipse(50% 50% at center);
+}

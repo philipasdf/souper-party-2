@@ -1,12 +1,4 @@
 <div #container>
     <img #sticker id="sticker" [src]="stickerUrl">
-    <img #avatar id="avatar" [src]="imgUrl">
+    <img #avatar id="avatar" class="clip-ellipse" [src]="imgUrl">
 </div>
-
-<svg width="0" height="0">
-    <defs>
-        <clipPath id="avatar_template">
-            <ellipse #avatarEllipse/>
-        </clipPath>
-    </defs>
-</svg>

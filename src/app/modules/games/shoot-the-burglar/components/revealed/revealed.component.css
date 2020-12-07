@@ -4,8 +4,6 @@ div {
 
 #avatar {
   position: absolute;
-  clip-path: url(#avatar_template);
-  width: auto;
 }
 
 #sticker {
