@@ -82,7 +82,8 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     this.processShots();
   }
 
-  onClick(event) {
+  onClick(event: Event) {
+    event.preventDefault();
     this.triggerShot$.next();
   }
 
