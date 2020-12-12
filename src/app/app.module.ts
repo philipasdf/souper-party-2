@@ -22,6 +22,7 @@ import { LobbyModule } from './modules/lobby/lobby.module';
 import { GamesRoutingModule } from './modules/games/games-routing.module';
 import { GameEffects } from './shared/effects/game.effects';
 import { GameCountdownComponent } from './modules/games/game-countdown/game-countdown.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -61,6 +62,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule.enablePersistence(),
     AngularFireStorageModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
   ],
   providers: [{ provide: BUCKET, useValue: environment.firebase.storageBucket }],
   bootstrap: [AppComponent],
