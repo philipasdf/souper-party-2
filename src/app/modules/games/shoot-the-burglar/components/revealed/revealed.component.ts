@@ -1,5 +1,4 @@
 import {
-  AfterContentInit,
   AfterViewInit,
   ChangeDetectorRef,
   Component,
@@ -33,7 +32,6 @@ export class RevealedComponent implements OnChanges, AfterViewInit {
   avatar: ElementRef;
 
   imgUrl = '';
-  stickerUrl = '';
 
   constructor(private renderer: Renderer2, private cdRef: ChangeDetectorRef) {}
 

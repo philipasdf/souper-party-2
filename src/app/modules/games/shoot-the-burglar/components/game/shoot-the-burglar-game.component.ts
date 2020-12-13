@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { combineLatest, Observable, Subject, timer } from 'rxjs';
+import { combineLatest, Subject, timer } from 'rxjs';
 import { filter, takeUntil, timestamp } from 'rxjs/operators';
+import * as shots from 'src/app/modules/games/shoot-the-burglar/reducers/shot.reducer';
 import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
 import { queryPlayers } from 'src/app/shared/actions/player.actions';
+import { UnsubscribingComponent } from 'src/app/shared/components/unsubscribing/unsubscribing.component';
 import { Player } from 'src/app/shared/models/player.model';
 import { selectCurrGame } from 'src/app/shared/reducers/game.reducer';
+import * as players from 'src/app/shared/reducers/player.reducer';
 import { GameCountdownService } from '../../../game-countdown/game-countdown.service';
 import { addShot, queryShots } from '../../actions/shot.actions';
 import { Shot } from '../../models/shot.model';
 import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
-import * as players from 'src/app/shared/reducers/player.reducer';
-import * as shots from 'src/app/modules/games/shoot-the-burglar/reducers/shot.reducer';
-import { UnsubscribingComponent } from 'src/app/shared/components/unsubscribing/unsubscribing.component';
+import { REVEALED_CONFIGS } from '../revealed/reavealed-configs';
 import { ShootTheBurglarService } from './shoot-the-burglar.service';
 
 @Component({
@@ -27,10 +28,10 @@ import { ShootTheBurglarService } from './shoot-the-burglar.service';
 })
 export class ShootTheBurglarGameComponent extends UnsubscribingComponent implements OnInit {
   playerFireId: string;
-
   gameFireId: string;
   data: ShootTheBurglarData;
 
+  preloadImgs = [];
   countdownEnded$ = new Subject();
   triggerShot$ = new Subject();
   players: Player[];
@@ -52,7 +53,9 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     super();
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.loadAllImages();
+
     const componentRef = this.countdown.startCountdown();
     componentRef.onDestroy(() => this.countdownEnded$.next(true));
 
@@ -80,6 +83,10 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
     this.processTriggers();
     this.processShots();
+  }
+
+  private loadAllImages() {
+    REVEALED_CONFIGS.forEach((r) => this.preloadImgs.push(r.src));
   }
 
   onClick(event: Event) {
