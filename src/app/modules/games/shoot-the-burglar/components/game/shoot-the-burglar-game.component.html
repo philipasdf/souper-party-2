@@ -1,6 +1,4 @@
-<h1>
-    {{ revealed }}
-</h1>
+<app-revealed *ngIf="revealedImg" [role]="revealed" [imgName]="revealedImg"></app-revealed>
 
 <div *ngIf="players">
     <p *ngFor="let p of players">
@@ -10,4 +8,4 @@
     </p>
 </div>
 
-<!-- 🔫💥 -->
+<img *ngFor="let i of preloadImgs" [src]="i" hidden height="0" width="0">

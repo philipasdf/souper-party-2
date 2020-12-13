@@ -38,6 +38,10 @@ export const joinPartySuccess = createAction(
 export const FAILED = `${PLAYER_TAG} failed`;
 export const failed = createAction(FAILED, props<{ errorMessage: string }>());
 
+export const SET_PLAYER_AVATAR = `${PLAYER_TAG} set avatar`;
+export const setPlayerAvatar = createAction(SET_PLAYER_AVATAR, props<{ avatar: string; avatarUrl: string }>());
+export type SetPlayerAvatar = ReturnType<typeof setPlayerAvatar>;
+
 /**
  * Step (=States) (maybe more than one action?)
  */

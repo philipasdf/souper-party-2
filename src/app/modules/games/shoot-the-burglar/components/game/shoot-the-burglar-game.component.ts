@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { combineLatest, Observable, Subject, timer } from 'rxjs';
+import { combineLatest, Subject, timer } from 'rxjs';
 import { filter, takeUntil, timestamp } from 'rxjs/operators';
+import * as shots from 'src/app/modules/games/shoot-the-burglar/reducers/shot.reducer';
 import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty } from 'src/app/shared/actions/party.actions';
 import { queryPlayers } from 'src/app/shared/actions/player.actions';
+import { UnsubscribingComponent } from 'src/app/shared/components/unsubscribing/unsubscribing.component';
 import { Player } from 'src/app/shared/models/player.model';
 import { selectCurrGame } from 'src/app/shared/reducers/game.reducer';
+import * as players from 'src/app/shared/reducers/player.reducer';
 import { GameCountdownService } from '../../../game-countdown/game-countdown.service';
 import { addShot, queryShots } from '../../actions/shot.actions';
 import { Shot } from '../../models/shot.model';
 import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
-import * as players from 'src/app/shared/reducers/player.reducer';
-import * as shots from 'src/app/modules/games/shoot-the-burglar/reducers/shot.reducer';
-import { UnsubscribingComponent } from 'src/app/shared/components/unsubscribing/unsubscribing.component';
+import { REVEALED_CONFIGS } from '../revealed/reavealed-configs';
 import { ShootTheBurglarService } from './shoot-the-burglar.service';
 
 @Component({
@@ -27,10 +28,10 @@ import { ShootTheBurglarService } from './shoot-the-burglar.service';
 })
 export class ShootTheBurglarGameComponent extends UnsubscribingComponent implements OnInit {
   playerFireId: string;
-
   gameFireId: string;
   data: ShootTheBurglarData;
 
+  preloadImgs = [];
   countdownEnded$ = new Subject();
   triggerShot$ = new Subject();
   players: Player[];
@@ -38,6 +39,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   currRound = 1;
   revealed = '';
+  revealedImg = null;
   scoresMap: Map<string, number>;
   lifepointsMap: Map<string, number>;
   revealedTimestamp: number;
@@ -51,7 +53,9 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     super();
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.loadAllImages();
+
     const componentRef = this.countdown.startCountdown();
     componentRef.onDestroy(() => this.countdownEnded$.next(true));
 
@@ -81,26 +85,37 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     this.processShots();
   }
 
-  onClick(event) {
+  private loadAllImages() {
+    REVEALED_CONFIGS.forEach((r) => this.preloadImgs.push(r.src));
+  }
+
+  onClick(event: Event) {
+    event.preventDefault();
     this.triggerShot$.next();
   }
 
   async revealBurglarsAndPrincesses() {
     while (this.currRound <= this.data.rounds.length) {
       this.revealed = '';
+      this.revealedImg = null;
       const round = this.data.rounds[this.currRound - 1];
 
       await timer(round.timeUntilReveal).toPromise();
       this.revealedTimestamp = new Date().getTime();
-      this.revealed = round.reveal;
+      this.revealed = round.reveal.role;
+      this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
-      await timer(1500).toPromise();
+      await timer(round.stayTime).toPromise();
       this.currRound++;
     }
     this.gameOver();
   }
 
-  gameOver() {
+  private getPlayerAvatar(fireId: string): string {
+    return this.players.find((p) => p.fireId === fireId).avatarUrl;
+  }
+
+  private gameOver() {
     console.log('game over');
     // update player step
     // host observes all players steps and processes further
@@ -135,6 +150,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       });
   }
 
+  // TODO: 🔫💥 Shooting animation
   private triggerShotAnimation(shot: Shot) {
     const name = this.players.find((p) => shot.userFireId === p.fireId).name;
     console.log(`%c ${name} shots ${shot.targetIndex}-${shot.target} in ${shot.shotTime} ms!`, 'color: red');

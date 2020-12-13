@@ -5,7 +5,12 @@ export interface ShootTheBurglarData {
 }
 
 export interface ShootTheBurglarRound {
-  reveal: string; // burglar or princess TODO burglar/princess id
+  reveal: ShootTheBurglarReveal;
   timeUntilReveal: number; // time until burglar/princess reveals
   stayTime: number; // time until burglar/princess disappears
+}
+
+export interface ShootTheBurglarReveal {
+  role: string; // burglar or princess
+  playerFireId: string;
 }

@@ -26,4 +26,9 @@ export class PlayerFsService {
     const ref = this.afs.doc<Player>(`${PARTY_PATH}/${partyName}/${PLAYER_PATH}/${playerName}`);
     return from(ref.update({ step }));
   }
+
+  setAvatar(partyName: string, playerName: string, avatar: string, avatarUrl: string) {
+    const ref = this.afs.doc<Player>(`${PARTY_PATH}/${partyName}/${PLAYER_PATH}/${playerName}`);
+    return from(ref.update({ avatar, avatarUrl }));
+  }
 }

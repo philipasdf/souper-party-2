@@ -1,0 +1,12 @@
+div {
+  position: relative;
+}
+
+#avatar {
+  position: absolute;
+}
+
+#sticker {
+  position: absolute;
+  z-index: 100;
+}

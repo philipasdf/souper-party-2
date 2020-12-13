@@ -21,6 +21,7 @@
     "error.party.createDocumentFailed": "Party konnte nicht gespeichert werden",
     "error.party.updateStepFailed": "Party Step konnte nicht geupdated werden",
     "error.player.updateStepFailed": "Player Step konnte nicht geupdated werden",
+    "error.player.updateAvatarFailed": "Player Avatar konnte nicht hochgeladen werden",
     "error.player.alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",
     "error.player.joinPartyFailed": "Party konnte nicht beigetreten werden",
     "game.shoot-the-burglar.name": "Erschieß den Einbrecher!",

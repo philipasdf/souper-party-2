@@ -3,10 +3,11 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { UnsubscribingComponent } from './components/unsubscribing/unsubscribing.component';
+import { AvatarComponent } from './images/components/avatar/avatar.component';
 
 @NgModule({
-  declarations: [UnsubscribingComponent],
+  declarations: [UnsubscribingComponent, AvatarComponent],
   imports: [CommonModule, FormsModule],
-  exports: [CommonModule, FormsModule, TranslateModule],
+  exports: [CommonModule, FormsModule, TranslateModule, AvatarComponent],
 })
 export class SharedModule {}

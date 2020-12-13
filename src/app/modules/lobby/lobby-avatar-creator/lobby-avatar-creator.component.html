@@ -1,0 +1,13 @@
+<div #container class="selfie-box">
+    <img #faceTemplate id="faceTemplate" src="assets/svgs/face_template_stroked-svg.svg">
+    <video #video playsinline autoplay></video>
+    <canvas #canvas></canvas>
+</div>
+<div style="position: relative;">
+    <button (click)="onSnapshot()">snapshot</button>
+    <button *ngIf="imgURL !== null" (click)="onNext()" [disabled]="isUploading">weiter</button>
+</div>
+
+<div [ngStyle]="{'height' : snapshotHeight + 'px', 'width': snapshotWidth + 'px' }">
+    <img #snapshot class="snapshot clip-ellipse" *ngIf="imgURL" [src]="imgURL">
+</div>
