@@ -23,6 +23,7 @@ import { GamesRoutingModule } from './modules/games/games-routing.module';
 import { GameEffects } from './shared/effects/game.effects';
 import { GameCountdownComponent } from './modules/games/game-countdown/game-countdown.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { BrowserSupportModule } from './modules/browser-support/browser-support.module';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -40,6 +41,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     LauncherModule,
     LobbyModule,
     GamesRoutingModule,
+    BrowserSupportModule,
 
     //ngx-translate
     TranslateModule.forRoot({
