@@ -131,6 +131,7 @@ export class LobbyAvatarCreatorComponent extends LobbyParentComponent implements
     this.isUploading = true;
     const uploadTask = await this.images.uploadImg(this.partyName, this.playerFireId, this.currPlayerAvatar);
     const imgUrl = await this.images.getImgURL(uploadTask.metadata.name).toPromise();
+    await this.images.updateMetadata(uploadTask.metadata.name).toPromise();
     this.store.dispatch(setPlayerAvatar({ avatar: uploadTask.metadata.name, avatarUrl: imgUrl }));
     await timer(3000).toPromise();
     this.isUploading = false;

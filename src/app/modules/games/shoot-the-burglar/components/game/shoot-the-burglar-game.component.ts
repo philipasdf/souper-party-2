@@ -98,8 +98,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       this.revealed = round.reveal.role;
       this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
-      await timer(10000000).toPromise();
-      // await timer(round.stayTime).toPromise();
+      await timer(round.stayTime).toPromise();
       this.currRound++;
     }
     this.gameOver();

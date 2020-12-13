@@ -8,7 +8,7 @@ import { BrowserService } from '../browser.service';
 export class LandingPageComponent implements OnInit {
   browser;
   userAgent;
-  version = '13.12. 10:33 iOS Firefox/Chrome forbidden';
+  version = '13.12. 14:47 set image cache';
 
   constructor(private browserService: BrowserService) {}
 

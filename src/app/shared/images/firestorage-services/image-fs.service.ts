@@ -14,4 +14,10 @@ export class ImageFsService {
     const fileName = `${partyName}_${playerFireId}_${file.name}`;
     return this.firestorage.upload(`/avatars/${fileName}`, file);
   }
+
+  updateMetadata(imgFileName: string): Observable<any> {
+    return this.firestorage
+      .ref(`/avatars/${imgFileName}`)
+      .updateMetadata({ cacheControl: 'public, max-age=6000, s-maxage=6000' });
+  }
 }
