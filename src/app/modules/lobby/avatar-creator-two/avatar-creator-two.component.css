@@ -5,7 +5,11 @@ canvas {
   left: 0;
 }
 
-div,
-button {
+div {
   position: relative;
+}
+
+.buttons {
+  text-align: right;
+  padding: 1rem;
 }

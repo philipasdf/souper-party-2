@@ -1,8 +1,11 @@
-<div>
+<div #container>
     <video #video id="inputVideo" autoplay muted playsinline></video>
     <canvas #snapshot></canvas>
+    <canvas #faceFocus></canvas>
     <canvas #trimFace></canvas>
 </div>
-<button *ngIf="!hasSnapshot" (click)="onSnapshot()">Snapshot</button>
-<button *ngIf="hasSnapshot" (click)="onCancel()">Verwerfen</button>
-<button *ngIf="hasSnapshot" (click)="onTrimFace()">OK!</button>
+<div *ngIf="isVideoSizeLoaded" class="buttons">
+    <button *ngIf="!hasSnapshot" [disabled]="isSnapshotDisabled" (click)="onSnapshot()">Snapshot</button>
+    <button *ngIf="hasSnapshot" (click)="onCancel()">Verwerfen</button>
+    <button *ngIf="hasSnapshot" (click)="onTrimFace()">OK!</button>
+</div>
