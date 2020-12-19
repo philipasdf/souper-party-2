@@ -21,8 +21,8 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
   @ViewChild('faceFocus', { static: true })
   faceFocus: ElementRef;
 
-  @ViewChild('trimFace', { static: true })
-  trimFace: ElementRef;
+  @ViewChild('faceTrace', { static: true })
+  faceTrace: ElementRef;
 
   @ViewChild('avatar', { static: true })
   avatar: ElementRef;
@@ -50,14 +50,14 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
   private async runFaceTracking() {
     if (this.hasSnapshot) {
       this.service.clearCanvasOfVideoDimensions(this.faceFocus.nativeElement, this.video.nativeElement);
-      this.service.clearCanvasOfVideoDimensions(this.trimFace.nativeElement, this.video.nativeElement);
+      this.service.clearCanvasOfVideoDimensions(this.faceTrace.nativeElement, this.video.nativeElement);
       return;
     }
 
     try {
-      const results = await this.service.computeFaceDetection(this.video.nativeElement, this.trimFace.nativeElement);
+      const detection = await this.service.detectFace(this.video.nativeElement, this.faceTrace.nativeElement);
 
-      this.drawFaceFocusBox(results?.box);
+      this.drawFaceFocusBox(detection?.box);
       this.setContainerSize();
 
       setTimeout(() => this.runFaceTracking());
@@ -88,7 +88,7 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
     this.isSnapshotDisabled = !this.service.drawStrokeRect(box, focusBoxRectSize, video, faceFocus.getContext('2d'));
   }
 
-  onDrawVideoSnapshotOnCanvas() {
+  async onDrawVideoSnapshotOnCanvas() {
     const sourceImage = this.video.nativeElement;
     const target = this.snapshot.nativeElement;
     const width = sourceImage.videoWidth;
@@ -96,60 +96,36 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
     this.renderer.setAttribute(target, 'width', width);
     this.renderer.setAttribute(target, 'height', height);
 
-    this.service.drawImageOnCanvas(sourceImage, target, width, height);
+    target.getContext('2d').drawImage(sourceImage, 0, 0, width, height, 0, 0, width, height);
     this.hasSnapshot = true;
+
+    const resizedResult = await this.service.detectFaceLandmarks(this.snapshot.nativeElement);
+    if (resizedResult) {
+      // for debugging
+      // faceapi.draw.drawDetections(this.trimFace.nativeElement, resizedResult);
+      // faceapi.draw.drawFaceLandmarks(this.trimFace.nativeElement, resizedResult);
+      this.drawAvatar(resizedResult.landmarks.positions);
+      this.saveAvatarFile();
+    } else {
+      this.onCancel();
+      alert('Ups! Bitte versuch es noch einmal. Manchmal kann kein Gesicht erkannt werden 8-)');
+    }
   }
 
   onCancel() {
     const canvas = this.snapshot.nativeElement;
     this.service.clearCanvas(this.snapshot.nativeElement, canvas.width, canvas.height);
-    this.service.clearCanvas(this.trimFace.nativeElement, canvas.width, canvas.height);
+    this.service.clearCanvas(this.faceTrace.nativeElement, canvas.width, canvas.height);
     this.service.clearCanvas(this.avatar.nativeElement, canvas.width, canvas.height);
     this.hasSnapshot = false;
     this.runFaceTracking();
   }
 
-  async onTrimFace() {
-    try {
-      const options = new faceapi.TinyFaceDetectorOptions();
-      const detection = await faceapi.detectSingleFace(this.snapshot.nativeElement, options).withFaceLandmarks(true);
-      console.log('detection', detection);
+  onSubmit() {}
 
-      const dims = faceapi.matchDimensions(this.trimFace.nativeElement, this.snapshot.nativeElement, true);
-      console.log('dims', dims);
-
-      if (detection) {
-        const resizedResult = faceapi.resizeResults(detection, dims);
-        console.log('resizedResult', resizedResult);
-
-        // faceapi.draw.drawDetections(this.trimFace.nativeElement, resizedResult);
-        // faceapi.draw.drawFaceLandmarks(this.trimFace.nativeElement, resizedResult);
-        this.drawAvatarRect(resizedResult.landmarks.positions);
-      } else {
-        // TODO reset everything, and display Message
-      }
-    } catch (error) {
-      console.error('failed to faceDetection()', error);
-    }
-  }
-
-  private drawAvatarRect(points: Point[]) {
+  private drawAvatar(points: Point[]) {
     const avatar = this.avatar.nativeElement;
-
-    const padding = 5;
-    const xMin = Math.min(...points.map((p) => p.x)) - padding;
-    const xMax = Math.max(...points.map((p) => p.x)) + padding;
-    const yMin = Math.min(...points.map((p) => p.y)) - padding;
-    const yMax = Math.max(...points.map((p) => p.y)) + padding;
-    const width = xMax - xMin;
-    const height = yMax - yMin;
-
-    // super hack, because the highest landmarkPoint is usually the eyebrow.
-    // With this offset I want to include the forehead and hair
-    const offset = height * 0.429;
-    const chinPadding = 15; // small padding to include the chin
-    const avatarHeight = height + offset;
-    const avatarWidth = width;
+    const { xMin, yMin, chinPadding, offset, avatarHeight, avatarWidth } = this.service.getAvatarDimensions(points);
 
     // for debugging
     // this.renderer.setAttribute(avatar, 'width', this.video.nativeElement.videoWidth);
@@ -174,8 +150,10 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
       );
 
     this.service.clearCanvasOfVideoDimensions(this.snapshot.nativeElement, this.video.nativeElement);
+  }
 
-    avatar.toBlob((blob) => {
+  private saveAvatarFile() {
+    this.avatar.nativeElement.toBlob((blob) => {
       this.currPlayerAvatar = new File([blob], 'snapshot.png', { type: 'image/png' });
     }, 'image/png');
   }
