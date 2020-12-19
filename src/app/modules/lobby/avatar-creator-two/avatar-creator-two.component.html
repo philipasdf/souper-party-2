@@ -3,6 +3,7 @@
     <canvas #snapshot></canvas>
     <canvas #faceFocus></canvas>
     <canvas #trimFace></canvas>
+    <canvas #avatar class="clip-ellipse"></canvas>
 </div>
 <div *ngIf="isVideoSizeLoaded" class="buttons">
     <button *ngIf="!hasSnapshot" [disabled]="isSnapshotDisabled" (click)="onDrawVideoSnapshotOnCanvas()">Snapshot</button>

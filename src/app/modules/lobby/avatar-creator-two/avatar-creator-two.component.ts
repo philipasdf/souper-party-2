@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import * as faceapi from 'node_modules/face-api.js';
+import { Point } from 'node_modules/face-api.js';
 import { AvatarCreatorService } from './avatar-creator.service';
 
 @Component({
@@ -23,9 +24,14 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
   @ViewChild('trimFace', { static: true })
   trimFace: ElementRef;
 
+  @ViewChild('avatar', { static: true })
+  avatar: ElementRef;
+
   hasSnapshot = false;
   isSnapshotDisabled = false;
   isVideoSizeLoaded = false;
+
+  currPlayerAvatar: File = null;
 
   constructor(private service: AvatarCreatorService, private renderer: Renderer2) {}
 
@@ -98,6 +104,7 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
     const canvas = this.snapshot.nativeElement;
     this.service.clearCanvas(this.snapshot.nativeElement, canvas.width, canvas.height);
     this.service.clearCanvas(this.trimFace.nativeElement, canvas.width, canvas.height);
+    this.service.clearCanvas(this.avatar.nativeElement, canvas.width, canvas.height);
     this.hasSnapshot = false;
     this.runFaceTracking();
   }
@@ -115,11 +122,61 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
         const resizedResult = faceapi.resizeResults(detection, dims);
         console.log('resizedResult', resizedResult);
 
-        faceapi.draw.drawDetections(this.trimFace.nativeElement, resizedResult);
-        faceapi.draw.drawFaceLandmarks(this.trimFace.nativeElement, resizedResult);
+        // faceapi.draw.drawDetections(this.trimFace.nativeElement, resizedResult);
+        // faceapi.draw.drawFaceLandmarks(this.trimFace.nativeElement, resizedResult);
+        this.drawAvatarRect(resizedResult.landmarks.positions);
+      } else {
+        // TODO reset everything, and display Message
       }
     } catch (error) {
       console.error('failed to faceDetection()', error);
     }
+  }
+
+  private drawAvatarRect(points: Point[]) {
+    const avatar = this.avatar.nativeElement;
+
+    const padding = 5;
+    const xMin = Math.min(...points.map((p) => p.x)) - padding;
+    const xMax = Math.max(...points.map((p) => p.x)) + padding;
+    const yMin = Math.min(...points.map((p) => p.y)) - padding;
+    const yMax = Math.max(...points.map((p) => p.y)) + padding;
+    const width = xMax - xMin;
+    const height = yMax - yMin;
+
+    // super hack, because the highest landmarkPoint is usually the eyebrow.
+    // With this offset I want to include the forehead and hair
+    const offset = height * 0.429;
+    const chinPadding = 15; // small padding to include the chin
+    const avatarHeight = height + offset;
+    const avatarWidth = width;
+
+    // for debugging
+    // this.renderer.setAttribute(avatar, 'width', this.video.nativeElement.videoWidth);
+    // this.renderer.setAttribute(avatar, 'height', this.video.nativeElement.videoHeight);
+    // ctx.strokeStyle = 'red';
+    // ctx.strokeRect(xMin, yMin - offset, width, height + offset);
+    this.renderer.setAttribute(avatar, 'width', `${avatarWidth}`);
+    this.renderer.setAttribute(avatar, 'height', `${avatarHeight}`);
+
+    avatar
+      .getContext('2d')
+      .drawImage(
+        this.snapshot.nativeElement,
+        xMin,
+        yMin - offset + chinPadding,
+        avatarWidth,
+        avatarHeight,
+        0,
+        0,
+        avatarWidth,
+        avatarHeight
+      );
+
+    this.service.clearCanvasOfVideoDimensions(this.snapshot.nativeElement, this.video.nativeElement);
+
+    avatar.toBlob((blob) => {
+      this.currPlayerAvatar = new File([blob], 'snapshot.png', { type: 'image/png' });
+    }, 'image/png');
   }
 }
