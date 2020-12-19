@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import * as faceapi from 'node_modules/face-api.js';
+import { AvatarCreatorService } from './avatar-creator.service';
 
 @Component({
   selector: 'app-avatar-creator-two',
@@ -26,20 +27,15 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
   isSnapshotDisabled = false;
   isVideoSizeLoaded = false;
 
-  constructor(private renderer: Renderer2) {}
+  constructor(private service: AvatarCreatorService, private renderer: Renderer2) {}
 
   async ngAfterViewInit() {
-    await this.initCam();
+    await this.service.initWebCam(this.video.nativeElement);
     await this.runFaceApi();
   }
 
-  private async initCam() {
-    this.video.nativeElement.srcObject = await navigator.mediaDevices.getUserMedia({ video: {} });
-  }
-
   private async runFaceApi() {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/assets/weights');
-    await faceapi.nets.faceLandmark68TinyNet.loadFromUri('/assets/weights');
+    await this.service.loadFaceApiWeights();
 
     this.runFaceTracking();
     this.setContainerSize();
@@ -47,19 +43,13 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
 
   private async runFaceTracking() {
     if (this.hasSnapshot) {
-      this.clearCanvas(this.faceFocus.nativeElement, this.video.nativeElement);
-      this.clearCanvas(this.trimFace.nativeElement, this.video.nativeElement);
+      this.service.clearCanvasOfVideoDimensions(this.faceFocus.nativeElement, this.video.nativeElement);
+      this.service.clearCanvasOfVideoDimensions(this.trimFace.nativeElement, this.video.nativeElement);
       return;
     }
 
     try {
-      const options = new faceapi.TinyFaceDetectorOptions();
-      const results = await faceapi.detectSingleFace(this.video.nativeElement, options);
-      const dims = faceapi.matchDimensions(this.trimFace.nativeElement, this.video.nativeElement, true);
-      if (results) {
-        const resizedResults = faceapi.resizeResults(results, dims);
-        faceapi.draw.drawDetections(this.trimFace.nativeElement, resizedResults);
-      }
+      const results = await this.service.computeFaceDetection(this.video.nativeElement, this.trimFace.nativeElement);
 
       this.drawFaceFocusBox(results?.box);
       this.setContainerSize();
@@ -80,64 +70,39 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
     }
   }
 
-  private clearCanvas(canvas, video) {
-    canvas.getContext('2d').clearRect(0, 0, video.videoWidth, video.videoHeight);
-  }
-
   private drawFaceFocusBox(box) {
     const faceFocus = this.faceFocus.nativeElement;
-    const ctx = faceFocus.getContext('2d');
     const video = this.video.nativeElement;
+    const focusBoxRectSize = 350;
 
     this.renderer.setAttribute(faceFocus, 'width', video.videoWidth);
     this.renderer.setAttribute(faceFocus, 'height', video.videoHeight);
 
-    this.clearCanvas(faceFocus, video);
-
-    const focusBox = 350;
-
-    const rectTop = video.videoHeight / 2 - focusBox / 2;
-    const rectLeft = video.videoWidth / 2 - focusBox / 2;
-    const rectBottom = rectTop + focusBox;
-    const rectRight = rectLeft + focusBox;
-
-    let isFocusMatching = false;
-    if (box) {
-      isFocusMatching = rectTop < box.top && rectLeft < box.left && rectBottom > box.bottom && rectRight > box.right;
-      this.isSnapshotDisabled = !isFocusMatching;
-    }
-
-    ctx.strokeStyle = isFocusMatching ? '#00FF00' : '#DB482E';
-    ctx.lineJoin = 'bevel';
-    ctx.lineWidth = 5;
-
-    ctx.strokeRect(rectLeft, rectTop, focusBox, focusBox);
+    this.service.clearCanvasOfVideoDimensions(faceFocus, video);
+    this.isSnapshotDisabled = !this.service.drawStrokeRect(box, focusBoxRectSize, video, faceFocus.getContext('2d'));
   }
 
-  onSnapshot() {
+  onDrawVideoSnapshotOnCanvas() {
     const sourceImage = this.video.nativeElement;
     const target = this.snapshot.nativeElement;
     const width = sourceImage.videoWidth;
     const height = sourceImage.videoHeight;
     this.renderer.setAttribute(target, 'width', width);
     this.renderer.setAttribute(target, 'height', height);
-    target.getContext('2d').drawImage(sourceImage, 0, 0, width, height, 0, 0, width, height);
+
+    this.service.drawImageOnCanvas(sourceImage, target, width, height);
     this.hasSnapshot = true;
   }
 
   onCancel() {
     const canvas = this.snapshot.nativeElement;
-    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-    this.trimFace.nativeElement.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    this.service.clearCanvas(this.snapshot.nativeElement, canvas.width, canvas.height);
+    this.service.clearCanvas(this.trimFace.nativeElement, canvas.width, canvas.height);
     this.hasSnapshot = false;
     this.runFaceTracking();
   }
 
-  onTrimFace() {
-    this.faceDetection();
-  }
-
-  private async faceDetection() {
+  async onTrimFace() {
     try {
       const options = new faceapi.TinyFaceDetectorOptions();
       const detection = await faceapi.detectSingleFace(this.snapshot.nativeElement, options).withFaceLandmarks(true);

@@ -5,7 +5,7 @@
     <canvas #trimFace></canvas>
 </div>
 <div *ngIf="isVideoSizeLoaded" class="buttons">
-    <button *ngIf="!hasSnapshot" [disabled]="isSnapshotDisabled" (click)="onSnapshot()">Snapshot</button>
+    <button *ngIf="!hasSnapshot" [disabled]="isSnapshotDisabled" (click)="onDrawVideoSnapshotOnCanvas()">Snapshot</button>
     <button *ngIf="hasSnapshot" (click)="onCancel()">Verwerfen</button>
     <button *ngIf="hasSnapshot" (click)="onTrimFace()">OK!</button>
 </div>
