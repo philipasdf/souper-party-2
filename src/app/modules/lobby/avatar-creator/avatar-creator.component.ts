@@ -11,11 +11,11 @@ import { LobbyParentComponent } from '../lobby-parent/lobby-parent.component';
 import { AvatarCreatorService } from './avatar-creator.service';
 
 @Component({
-  selector: 'app-avatar-creator-two',
-  templateUrl: './avatar-creator-two.component.html',
-  styleUrls: ['./avatar-creator-two.component.css'],
+  selector: 'app-avatar-creator',
+  templateUrl: './avatar-creator.component.html',
+  styleUrls: ['./avatar-creator.component.css'],
 })
-export class AvatarCreatorTwoComponent extends LobbyParentComponent implements OnInit, AfterViewInit {
+export class AvatarCreatorComponent extends LobbyParentComponent implements OnInit, AfterViewInit {
   @ViewChild('container', { static: true })
   container: ElementRef;
 

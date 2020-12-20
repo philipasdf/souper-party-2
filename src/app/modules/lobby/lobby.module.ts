@@ -4,11 +4,10 @@ import { LobbyRoutingModule } from './lobby-routing.module';
 import { LobbyHomeComponent } from './lobby-home/lobby-home.component';
 import { LobbyGameGuideComponent } from './lobby-game-guide/lobby-game-guide.component';
 import { LobbyParentComponent } from './lobby-parent/lobby-parent.component';
-import { LobbyAvatarCreatorComponent } from './lobby-avatar-creator/lobby-avatar-creator.component';
-import { AvatarCreatorTwoComponent } from './avatar-creator-two/avatar-creator-two.component';
+import { AvatarCreatorComponent } from './avatar-creator/avatar-creator.component';
 
 @NgModule({
-  declarations: [LobbyHomeComponent, LobbyGameGuideComponent, LobbyParentComponent, LobbyAvatarCreatorComponent, AvatarCreatorTwoComponent],
+  declarations: [LobbyHomeComponent, LobbyGameGuideComponent, LobbyParentComponent, AvatarCreatorComponent],
   imports: [SharedModule, LobbyRoutingModule],
 })
 export class LobbyModule {}
