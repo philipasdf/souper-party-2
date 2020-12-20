@@ -11,7 +11,8 @@ import { JOIN_PARTY_SUCCESS } from 'src/app/shared/actions/player.actions';
   styleUrls: ['./launcher-create-or-join.component.css'],
 })
 export class LauncherCreateOrJoinComponent implements OnInit, OnDestroy {
-  partyNameInput = '';
+  _partyNameInput = '';
+
   errorMessage: string;
 
   constructor(private store: Store, private actions$: Actions, private router: Router) {}
@@ -39,5 +40,13 @@ export class LauncherCreateOrJoinComponent implements OnInit, OnDestroy {
 
   join() {
     this.store.dispatch(joinPartyIfExists({ name: this.partyNameInput.trim() }));
+  }
+
+  get partyNameInput() {
+    return this._partyNameInput;
+  }
+
+  set partyNameInput(input: string) {
+    this._partyNameInput = input.toUpperCase();
   }
 }
