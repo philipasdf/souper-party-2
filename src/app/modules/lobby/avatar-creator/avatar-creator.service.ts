@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as faceapi from 'node_modules/face-api.js';
-import { Point } from 'node_modules/face-api.js';
+import { Point, resizeResults } from 'node_modules/face-api.js';
 
 @Injectable({
   providedIn: 'root',
@@ -19,22 +19,19 @@ export class AvatarCreatorService {
     await faceapi.nets.faceLandmark68TinyNet.loadFromUri('/assets/weights');
   }
 
-  clearCanvasOfVideoDimensions(canvas, video) {
-    canvas.getContext('2d').clearRect(0, 0, video.videoWidth, video.videoHeight);
-  }
-
-  clearCanvas(target, width, height) {
-    target.getContext('2d').clearRect(0, 0, width, height);
+  clearCanvas(canvas, dimensionSource) {
+    canvas.getContext('2d').clearRect(0, 0, dimensionSource.width, dimensionSource.height);
   }
 
   async detectFace(videoSource, canvasTarget) {
     const results = await faceapi.detectSingleFace(videoSource, this.tinyFaceDetectorOptions);
-    const dims = faceapi.matchDimensions(canvasTarget, videoSource, true);
+    const dims = faceapi.matchDimensions(canvasTarget, videoSource, false);
+    let resizedResults;
     if (results) {
-      const resizedResults = faceapi.resizeResults(results, dims);
+      resizedResults = faceapi.resizeResults(results, dims);
       faceapi.draw.drawDetections(canvasTarget, resizedResults);
     }
-    return results;
+    return resizedResults;
   }
 
   async detectFaceLandmarks(source) {
@@ -54,8 +51,10 @@ export class AvatarCreatorService {
    * @return boolean is detection matching the rect
    */
   drawStrokeRect(detectionBox, rectSize: number, video, targetContext): boolean {
-    const rectTop = video.videoHeight / 2 - rectSize / 2;
-    const rectLeft = video.videoWidth / 2 - rectSize / 2;
+    // const rectTop = video.videoHeight / 2 - rectSize / 2;
+    // const rectLeft = video.videoWidth / 2 - rectSize / 2;
+    const rectTop = video.height / 2 - rectSize / 2;
+    const rectLeft = video.width / 2 - rectSize / 2;
     const rectBottom = rectTop + rectSize;
     const rectRight = rectLeft + rectSize;
 
@@ -78,20 +77,6 @@ export class AvatarCreatorService {
   }
 
   drawAvatar(points: Point[], canvas) {}
-
-  getAvatarHeight(yMin: number, yMax: number) {
-    const height = yMax - yMin;
-    // super hack, because the highest landmarkPoint is usually the eyebrow.
-    // With this offset I want to include the forehead and hair
-    const offset = height * 0.429;
-    const avatarHeight = height + offset;
-    return { avatarHeight, offset };
-  }
-
-  getAvatarWidth(xMin: number, xMax: number) {
-    const avatarWidth = xMax - xMin;
-    return avatarWidth;
-  }
 
   getAvatarDimensions(points: Point[]) {
     const padding = 5;

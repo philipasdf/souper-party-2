@@ -1,6 +1,6 @@
 <div #container>
-    <video #video id="inputVideo" autoplay muted playsinline></video>
-    <canvas #snapshot></canvas>
+    <video #video id="inputVideo" autoplay muted playsinline [ngClass]="{ 'hidden': isVideoHidden}"></video>
+    <canvas #snapshot style="display: none"></canvas>
     <canvas #faceFocus></canvas>
     <canvas #faceTrace></canvas>
     <canvas #avatar class="clip-ellipse"></canvas>

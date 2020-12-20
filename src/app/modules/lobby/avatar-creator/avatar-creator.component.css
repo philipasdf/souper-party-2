@@ -13,3 +13,7 @@ div {
   text-align: right;
   padding: 1rem;
 }
+
+.hidden {
+  display: none;
+}

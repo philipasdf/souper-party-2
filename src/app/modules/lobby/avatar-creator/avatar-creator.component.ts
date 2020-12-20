@@ -34,10 +34,16 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
   @ViewChild('avatar', { static: true })
   avatar: ElementRef;
 
+  SCREENWIDTH = 0;
+  videoRatio = 0;
+  videoWidth = 0; // finally calculated video width responsive to Screensize
+  videoHeight = 0; // finally calculated video width responsive to Screensize
+
   hasSnapshot = false;
   isSnapshotDisabled = false;
   isVideoSizeLoaded = false;
   isUploading = false;
+  isVideoHidden = true;
 
   currPlayerAvatar: File = null;
 
@@ -63,6 +69,8 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
 
   async ngAfterViewInit() {
     await this.service.initWebCam(this.video.nativeElement);
+    await timer(200).toPromise(); // wait for video.videoWidth and video.videoHeight to get initialized
+    this.setVideoSize();
     await this.runFaceApi();
   }
 
@@ -71,18 +79,19 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
     const target = this.snapshot.nativeElement;
     const width = sourceImage.videoWidth;
     const height = sourceImage.videoHeight;
+
     this.renderer.setAttribute(target, 'width', width);
     this.renderer.setAttribute(target, 'height', height);
 
     target.getContext('2d').drawImage(sourceImage, 0, 0, width, height, 0, 0, width, height);
     this.hasSnapshot = true;
 
-    const resizedResult = await this.service.detectFaceLandmarks(this.snapshot.nativeElement);
-    if (resizedResult) {
+    const detection = await this.service.detectFaceLandmarks(this.snapshot.nativeElement);
+    if (detection) {
       // for debugging
-      // faceapi.draw.drawDetections(this.trimFace.nativeElement, resizedResult);
-      // faceapi.draw.drawFaceLandmarks(this.trimFace.nativeElement, resizedResult);
-      this.drawAvatar(resizedResult.landmarks.positions);
+      // faceapi.draw.drawDetections(this.trimFace.nativeElement, detection);
+      // faceapi.draw.drawFaceLandmarks(this.trimFace.nativeElement, detection);
+      this.drawAvatar(detection.landmarks.positions);
       this.saveAvatarFile();
     } else {
       this.onCancel();
@@ -92,10 +101,11 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
 
   onCancel() {
     const canvas = this.snapshot.nativeElement;
-    this.service.clearCanvas(this.snapshot.nativeElement, canvas.width, canvas.height);
-    this.service.clearCanvas(this.faceTrace.nativeElement, canvas.width, canvas.height);
-    this.service.clearCanvas(this.avatar.nativeElement, canvas.width, canvas.height);
+    this.service.clearCanvas(this.snapshot.nativeElement, canvas);
+    this.service.clearCanvas(this.faceTrace.nativeElement, canvas);
+    this.service.clearCanvas(this.avatar.nativeElement, canvas);
     this.hasSnapshot = false;
+    this.isVideoHidden = false;
     this.runFaceTracking();
   }
 
@@ -109,26 +119,36 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
     this.isUploading = false;
   }
 
+  private setVideoSize() {
+    this.SCREENWIDTH = window.outerWidth;
+    const video = this.video.nativeElement;
+    this.videoRatio = video.videoWidth / video.videoHeight;
+    this.videoWidth = Math.min(this.SCREENWIDTH, video.videoWidth);
+    this.videoHeight = this.videoWidth / this.videoRatio;
+
+    this.renderer.setAttribute(this.video.nativeElement, 'width', `${this.videoWidth}`);
+    this.renderer.setAttribute(this.video.nativeElement, 'height', `${this.videoHeight}`);
+    this.renderer.setAttribute(this.faceTrace.nativeElement, 'width', this.video.nativeElement.width);
+    this.renderer.setAttribute(this.faceTrace.nativeElement, 'height', this.video.nativeElement.height);
+  }
+
   private async runFaceApi() {
     await this.service.loadFaceApiWeights();
-
     this.runFaceTracking();
     this.setContainerSize();
   }
 
   private async runFaceTracking() {
+    this.isVideoHidden = false;
     if (this.hasSnapshot) {
-      this.service.clearCanvasOfVideoDimensions(this.faceFocus.nativeElement, this.video.nativeElement);
-      this.service.clearCanvasOfVideoDimensions(this.faceTrace.nativeElement, this.video.nativeElement);
+      this.service.clearCanvas(this.faceFocus.nativeElement, this.video.nativeElement);
+      this.service.clearCanvas(this.faceTrace.nativeElement, this.video.nativeElement);
       return;
     }
-
     try {
       const detection = await this.service.detectFace(this.video.nativeElement, this.faceTrace.nativeElement);
-
       this.drawFaceFocusBox(detection?.box);
       this.setContainerSize();
-
       setTimeout(() => this.runFaceTracking());
     } catch (error) {
       console.error('failed to runFaceTracking()', error);
@@ -138,12 +158,12 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
   private drawFaceFocusBox(box) {
     const faceFocus = this.faceFocus.nativeElement;
     const video = this.video.nativeElement;
-    const focusBoxRectSize = 350;
+    const focusBoxRectSize = Math.min(this.videoWidth, this.videoHeight) * 0.75;
 
-    this.renderer.setAttribute(faceFocus, 'width', video.videoWidth);
-    this.renderer.setAttribute(faceFocus, 'height', video.videoHeight);
+    this.renderer.setAttribute(faceFocus, 'width', video.width);
+    this.renderer.setAttribute(faceFocus, 'height', video.height);
 
-    this.service.clearCanvasOfVideoDimensions(faceFocus, video);
+    this.service.clearCanvas(faceFocus, video);
     this.isSnapshotDisabled = !this.service.drawStrokeRect(box, focusBoxRectSize, video, faceFocus.getContext('2d'));
   }
 
@@ -151,8 +171,8 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
     if (this.video.nativeElement.videoWidth > 0 && !this.isVideoSizeLoaded) {
       const container = this.container.nativeElement;
       const video = this.video.nativeElement;
-      this.renderer.setStyle(container, 'height', `${video.videoHeight}px`);
-      this.renderer.setStyle(container, 'width', `${video.videoWidth}px`);
+      this.renderer.setStyle(container, 'height', `${video.height}px`);
+      this.renderer.setStyle(container, 'width', `${video.width}px`);
       this.isVideoSizeLoaded = true;
     }
   }
@@ -182,8 +202,8 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
         avatarWidth,
         avatarHeight
       );
-
-    this.service.clearCanvasOfVideoDimensions(this.snapshot.nativeElement, this.video.nativeElement);
+    this.isVideoHidden = true;
+    this.service.clearCanvas(this.snapshot.nativeElement, this.video.nativeElement);
   }
 
   private saveAvatarFile() {
