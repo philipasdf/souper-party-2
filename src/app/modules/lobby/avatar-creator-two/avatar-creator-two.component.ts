@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
-import * as faceapi from 'node_modules/face-api.js';
 import { Point } from 'node_modules/face-api.js';
 import { AvatarCreatorService } from './avatar-creator.service';
 
@@ -30,6 +29,7 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
   hasSnapshot = false;
   isSnapshotDisabled = false;
   isVideoSizeLoaded = false;
+  isUploading = false;
 
   currPlayerAvatar: File = null;
 
@@ -38,54 +38,6 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
   async ngAfterViewInit() {
     await this.service.initWebCam(this.video.nativeElement);
     await this.runFaceApi();
-  }
-
-  private async runFaceApi() {
-    await this.service.loadFaceApiWeights();
-
-    this.runFaceTracking();
-    this.setContainerSize();
-  }
-
-  private async runFaceTracking() {
-    if (this.hasSnapshot) {
-      this.service.clearCanvasOfVideoDimensions(this.faceFocus.nativeElement, this.video.nativeElement);
-      this.service.clearCanvasOfVideoDimensions(this.faceTrace.nativeElement, this.video.nativeElement);
-      return;
-    }
-
-    try {
-      const detection = await this.service.detectFace(this.video.nativeElement, this.faceTrace.nativeElement);
-
-      this.drawFaceFocusBox(detection?.box);
-      this.setContainerSize();
-
-      setTimeout(() => this.runFaceTracking());
-    } catch (error) {
-      console.error('failed to runFaceTracking()', error);
-    }
-  }
-
-  private setContainerSize() {
-    if (this.video.nativeElement.videoWidth > 0 && !this.isVideoSizeLoaded) {
-      const container = this.container.nativeElement;
-      const video = this.video.nativeElement;
-      this.renderer.setStyle(container, 'height', `${video.videoHeight}px`);
-      this.renderer.setStyle(container, 'width', `${video.videoWidth}px`);
-      this.isVideoSizeLoaded = true;
-    }
-  }
-
-  private drawFaceFocusBox(box) {
-    const faceFocus = this.faceFocus.nativeElement;
-    const video = this.video.nativeElement;
-    const focusBoxRectSize = 350;
-
-    this.renderer.setAttribute(faceFocus, 'width', video.videoWidth);
-    this.renderer.setAttribute(faceFocus, 'height', video.videoHeight);
-
-    this.service.clearCanvasOfVideoDimensions(faceFocus, video);
-    this.isSnapshotDisabled = !this.service.drawStrokeRect(box, focusBoxRectSize, video, faceFocus.getContext('2d'));
   }
 
   async onDrawVideoSnapshotOnCanvas() {
@@ -121,7 +73,63 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
     this.runFaceTracking();
   }
 
-  onSubmit() {}
+  onSubmit() {
+    this.isUploading = true;
+    // const uploadTask = await this.images.uploadImg(this.partyName, this.playerFireId, this.currPlayerAvatar);
+    // const imgUrl = await this.images.getImgURL(uploadTask.metadata.name).toPromise();
+    // await this.images.updateMetadata(uploadTask.metadata.name).toPromise();
+    // this.store.dispatch(setPlayerAvatar({ avatar: uploadTask.metadata.name, avatarUrl: imgUrl }));
+    // await timer(3000).toPromise();
+    this.isUploading = false;
+  }
+
+  private async runFaceApi() {
+    await this.service.loadFaceApiWeights();
+
+    this.runFaceTracking();
+    this.setContainerSize();
+  }
+
+  private async runFaceTracking() {
+    if (this.hasSnapshot) {
+      this.service.clearCanvasOfVideoDimensions(this.faceFocus.nativeElement, this.video.nativeElement);
+      this.service.clearCanvasOfVideoDimensions(this.faceTrace.nativeElement, this.video.nativeElement);
+      return;
+    }
+
+    try {
+      const detection = await this.service.detectFace(this.video.nativeElement, this.faceTrace.nativeElement);
+
+      this.drawFaceFocusBox(detection?.box);
+      this.setContainerSize();
+
+      setTimeout(() => this.runFaceTracking());
+    } catch (error) {
+      console.error('failed to runFaceTracking()', error);
+    }
+  }
+
+  private drawFaceFocusBox(box) {
+    const faceFocus = this.faceFocus.nativeElement;
+    const video = this.video.nativeElement;
+    const focusBoxRectSize = 350;
+
+    this.renderer.setAttribute(faceFocus, 'width', video.videoWidth);
+    this.renderer.setAttribute(faceFocus, 'height', video.videoHeight);
+
+    this.service.clearCanvasOfVideoDimensions(faceFocus, video);
+    this.isSnapshotDisabled = !this.service.drawStrokeRect(box, focusBoxRectSize, video, faceFocus.getContext('2d'));
+  }
+
+  private setContainerSize() {
+    if (this.video.nativeElement.videoWidth > 0 && !this.isVideoSizeLoaded) {
+      const container = this.container.nativeElement;
+      const video = this.video.nativeElement;
+      this.renderer.setStyle(container, 'height', `${video.videoHeight}px`);
+      this.renderer.setStyle(container, 'width', `${video.videoWidth}px`);
+      this.isVideoSizeLoaded = true;
+    }
+  }
 
   private drawAvatar(points: Point[]) {
     const avatar = this.avatar.nativeElement;
