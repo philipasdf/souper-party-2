@@ -46,7 +46,7 @@ export class RevealedComponent implements OnChanges, AfterViewInit {
   }
 
   private updateImageSizes() {
-    const totalWidth = window.outerWidth;
+    const totalWidth = Math.min(window.outerWidth, 500);
     const shuffled = this.shuffleArray(REVEALED_CONFIGS);
     const config = shuffled.find((s) => s.role === this.role);
 

@@ -14,10 +14,11 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "skipLibCheck": true  // due to face-api & tensorflow : https://www.tensorflow.org/js/tutorials/setup#typescript
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
-  }
+  },
 }

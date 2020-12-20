@@ -1,0 +1,15 @@
+video,
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+div {
+  position: relative;
+}
+
+.buttons {
+  text-align: right;
+  padding: 1rem;
+}
