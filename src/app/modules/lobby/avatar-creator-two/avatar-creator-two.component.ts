@@ -1,5 +1,13 @@
-import { AfterViewInit, Component, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Actions, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
 import { Point } from 'node_modules/face-api.js';
+import { timer } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { setPlayerAvatar, SUCCESS } from 'src/app/shared/actions/player.actions';
+import { ImageFsService } from 'src/app/shared/images/firestorage-services/image-fs.service';
+import { LobbyParentComponent } from '../lobby-parent/lobby-parent.component';
 import { AvatarCreatorService } from './avatar-creator.service';
 
 @Component({
@@ -7,7 +15,7 @@ import { AvatarCreatorService } from './avatar-creator.service';
   templateUrl: './avatar-creator-two.component.html',
   styleUrls: ['./avatar-creator-two.component.css'],
 })
-export class AvatarCreatorTwoComponent implements AfterViewInit {
+export class AvatarCreatorTwoComponent extends LobbyParentComponent implements OnInit, AfterViewInit {
   @ViewChild('container', { static: true })
   container: ElementRef;
 
@@ -33,7 +41,25 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
 
   currPlayerAvatar: File = null;
 
-  constructor(private service: AvatarCreatorService, private renderer: Renderer2) {}
+  constructor(
+    protected route: ActivatedRoute,
+    protected store: Store,
+    private images: ImageFsService,
+    private actions$: Actions,
+    private router: Router,
+    private renderer: Renderer2,
+    private service: AvatarCreatorService
+  ) {
+    super(route, store);
+  }
+
+  ngOnInit(): void {
+    super.ngOnInit();
+
+    this.actions$
+      .pipe(takeUntil(this.unsub$), ofType(SUCCESS))
+      .subscribe(() => this.router.navigate([`lobby/${this.partyName}/${this.playerFireId}`]));
+  }
 
   async ngAfterViewInit() {
     await this.service.initWebCam(this.video.nativeElement);
@@ -73,13 +99,13 @@ export class AvatarCreatorTwoComponent implements AfterViewInit {
     this.runFaceTracking();
   }
 
-  onSubmit() {
+  async onSubmit() {
     this.isUploading = true;
-    // const uploadTask = await this.images.uploadImg(this.partyName, this.playerFireId, this.currPlayerAvatar);
-    // const imgUrl = await this.images.getImgURL(uploadTask.metadata.name).toPromise();
-    // await this.images.updateMetadata(uploadTask.metadata.name).toPromise();
-    // this.store.dispatch(setPlayerAvatar({ avatar: uploadTask.metadata.name, avatarUrl: imgUrl }));
-    // await timer(3000).toPromise();
+    const uploadTask = await this.images.uploadImg(this.partyName, this.playerFireId, this.currPlayerAvatar);
+    const imgUrl = await this.images.getImgURL(uploadTask.metadata.name).toPromise();
+    await this.images.updateMetadata(uploadTask.metadata.name).toPromise();
+    this.store.dispatch(setPlayerAvatar({ avatar: uploadTask.metadata.name, avatarUrl: imgUrl }));
+    await timer(3000).toPromise();
     this.isUploading = false;
   }
 
