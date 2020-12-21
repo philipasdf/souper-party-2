@@ -5,6 +5,7 @@ export interface ShootTheBurglarData {
 }
 
 export interface ShootTheBurglarRound {
+  revealedId: string; // id in revealed-configs.ts
   reveal: ShootTheBurglarReveal;
   timeUntilReveal: number; // time until burglar/princess reveals
   stayTime: number; // time until burglar/princess disappears

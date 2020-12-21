@@ -15,7 +15,7 @@ import { GameCountdownService } from '../../../game-countdown/game-countdown.ser
 import { addShot, queryShots } from '../../actions/shot.actions';
 import { Shot } from '../../models/shot.model';
 import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
-import { REVEALED_CONFIGS } from '../revealed/reavealed-configs';
+import { REVEALED_CONFIGS } from '../revealed/revealed-configs';
 import { ShootTheBurglarService } from './shoot-the-burglar.service';
 
 @Component({
@@ -39,7 +39,8 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   playerScores: { fireId: string }[] = []; // score: if you shot a burglar first, you earn one score
 
   currRound = 1;
-  revealed = '';
+  currRole = null;
+  revealedId = null;
   revealedImg = null;
   scoresMap: Map<string, number>;
   lifepointsMap: Map<string, number>;
@@ -99,13 +100,15 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   async revealBurglarsAndPrincesses() {
     while (this.currRound <= this.data.rounds.length) {
-      this.revealed = '';
+      this.currRole = null;
+      this.revealedId = null;
       this.revealedImg = null;
       const round = this.data.rounds[this.currRound - 1];
 
       await timer(round.timeUntilReveal).toPromise();
       this.revealedTimestamp = new Date().getTime();
-      this.revealed = round.reveal.role;
+      this.currRole = round.reveal.role;
+      this.revealedId = round.revealedId;
       this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
       await timer(round.stayTime).toPromise();
@@ -129,7 +132,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       const shot: Shot = {
         id: `${this.playerFireId}-${trigger.timestamp}`,
         shotTime: this.revealedTimestamp ? trigger.timestamp - this.revealedTimestamp : null,
-        target: this.revealed,
+        targetRole: this.currRole,
         targetIndex: this.currRound,
         timestamp: trigger.timestamp,
         userFireId: this.playerFireId,
@@ -157,7 +160,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   private triggerShotAnimation(shot: Shot) {
     const name = this.players.find((p) => shot.userFireId === p.fireId).name;
-    console.log(`%c ${name} shots ${shot.targetIndex}-${shot.target} in ${shot.shotTime} ms!`, 'color: red');
+    console.log(`%c ${name} shots ${shot.targetIndex}-${shot.targetRole} in ${shot.shotTime} ms!`, 'color: red');
 
     // TODO make another animation, which displays the name, ms and stays until new round (and green color if hit, red if loosing life)
     const x = this.RESPONSIVE_WIDTH * shot.relativeX;

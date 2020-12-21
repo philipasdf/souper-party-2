@@ -8,7 +8,7 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import { REVEALED_CONFIGS } from './reavealed-configs';
+import { REVEALED_CONFIGS } from './revealed-configs';
 
 @Component({
   selector: 'app-revealed',
@@ -17,7 +17,7 @@ import { REVEALED_CONFIGS } from './reavealed-configs';
 })
 export class RevealedComponent implements OnChanges, AfterViewInit {
   @Input()
-  role: string;
+  revealedId: string;
 
   @Input()
   imgName: string;
@@ -50,8 +50,10 @@ export class RevealedComponent implements OnChanges, AfterViewInit {
 
   private updateImageSizes() {
     const totalWidth = this.totalWidth;
-    const shuffled = this.shuffleArray(REVEALED_CONFIGS);
-    const config = shuffled.find((s) => s.role === this.role);
+    if (!this.revealedId) {
+      return;
+    }
+    const config = REVEALED_CONFIGS.find((r) => r.revealedId === this.revealedId);
 
     const container = this.container.nativeElement;
     this.renderer.setStyle(container, 'height', `${totalWidth}px`);
