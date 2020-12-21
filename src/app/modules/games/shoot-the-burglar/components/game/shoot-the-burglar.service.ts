@@ -47,6 +47,7 @@ export class ShootTheBurglarService {
   }
 
   getLifepoints(playerFireId: string, lifepointsMap: Map<string, number>) {
-    return lifepointsMap?.get(playerFireId) == null ? this.MAX_LIFEPOINTS : lifepointsMap.get(playerFireId);
+    const result = lifepointsMap?.get(playerFireId) == null ? this.MAX_LIFEPOINTS : lifepointsMap.get(playerFireId);
+    return Math.max(result, 0);
   }
 }

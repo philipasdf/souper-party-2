@@ -30,6 +30,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   playerFireId: string;
   gameFireId: string;
   data: ShootTheBurglarData;
+  RESPONSIVE_WIDTH = 0;
 
   preloadImgs = [];
   countdownEnded$ = new Subject();
@@ -54,6 +55,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   }
 
   async ngOnInit() {
+    this.RESPONSIVE_WIDTH = Math.min(window.outerWidth, 500);
     this.loadAllImages();
 
     const componentRef = this.countdown.startCountdown();
@@ -89,9 +91,10 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     REVEALED_CONFIGS.forEach((r) => this.preloadImgs.push(r.src));
   }
 
-  onClick(event: Event) {
+  onClick(event: MouseEvent) {
     event.preventDefault();
-    this.triggerShot$.next();
+    this.triggerShot$.next(event);
+    this.drawRipple(event.clientX, event.clientY);
   }
 
   async revealBurglarsAndPrincesses() {
@@ -122,7 +125,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   }
 
   private processTriggers() {
-    this.triggerShot$.pipe(timestamp()).subscribe((trigger) => {
+    this.triggerShot$.pipe(timestamp()).subscribe((trigger: { value: MouseEvent; timestamp: number }) => {
       const shot: Shot = {
         id: `${this.playerFireId}-${trigger.timestamp}`,
         shotTime: this.revealedTimestamp ? trigger.timestamp - this.revealedTimestamp : null,
@@ -130,6 +133,8 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
         targetIndex: this.currRound,
         timestamp: trigger.timestamp,
         userFireId: this.playerFireId,
+        relativeX: trigger.value.x / this.RESPONSIVE_WIDTH,
+        relativeY: trigger.value.y / this.RESPONSIVE_WIDTH,
       };
 
       this.store.dispatch(addShot({ gameFireId: this.gameFireId, shot }));
@@ -150,10 +155,14 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       });
   }
 
-  // TODO: 🔫💥 Shooting animation
   private triggerShotAnimation(shot: Shot) {
     const name = this.players.find((p) => shot.userFireId === p.fireId).name;
     console.log(`%c ${name} shots ${shot.targetIndex}-${shot.target} in ${shot.shotTime} ms!`, 'color: red');
+
+    // TODO make another animation, which displays the name, ms and stays until new round (and green color if hit, red if loosing life)
+    const x = this.RESPONSIVE_WIDTH * shot.relativeX;
+    const y = this.RESPONSIVE_WIDTH * shot.relativeY;
+    this.drawRipple(x, y);
   }
 
   getScore(playerFireId: string) {
@@ -162,5 +171,14 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   getLifepoints(playerFireId: string) {
     return this.shootTheBurglar.getLifepoints(playerFireId, this.lifepointsMap);
+  }
+
+  private drawRipple(x, y) {
+    const node = document.querySelector('.ripple');
+    const newNode: any = node.cloneNode(true);
+    newNode.classList.add('animate');
+    newNode.style.left = x - 5 + 'px';
+    newNode.style.top = y - 5 + 'px';
+    node.parentNode.replaceChild(newNode, node);
   }
 }
