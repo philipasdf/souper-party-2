@@ -1,0 +1,28 @@
+ul {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  z-index: 1000;
+  list-style: none;
+}
+
+.correct-shot {
+  color: black;
+  animation: appear 1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.wrong-shot {
+  font-weight: bold;
+  color: red;
+  animation: appear 1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

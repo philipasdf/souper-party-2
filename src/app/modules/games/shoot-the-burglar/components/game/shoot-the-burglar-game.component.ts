@@ -16,6 +16,7 @@ import { addShot, queryShots } from '../../actions/shot.actions';
 import { Shot } from '../../models/shot.model';
 import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
 import { REVEALED_CONFIGS } from '../revealed/revealed-configs';
+import { ShotNotificationService } from '../shot-notifications/shot-notification.service';
 import { ShootTheBurglarService } from './shoot-the-burglar.service';
 
 @Component({
@@ -50,7 +51,8 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     private route: ActivatedRoute,
     private store: Store,
     private countdown: GameCountdownService,
-    private shootTheBurglar: ShootTheBurglarService
+    private shootTheBurglar: ShootTheBurglarService,
+    private shotNotification: ShotNotificationService
   ) {
     super();
   }
@@ -154,18 +156,21 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       .subscribe((shots: Shot[]) => {
         this.scoresMap = this.shootTheBurglar.calculateScores(shots, this.currRound);
         this.lifepointsMap = this.shootTheBurglar.calculateLifepoints(shots, this.players);
-        this.triggerShotAnimation(shots[shots.length - 1]);
+        const latestShot = shots[shots.length - 1];
+        this.triggerShotAnimation(latestShot);
+        this.triggerShotNotification(latestShot);
       });
   }
 
   private triggerShotAnimation(shot: Shot) {
-    const name = this.players.find((p) => shot.userFireId === p.fireId).name;
-    console.log(`%c ${name} shots ${shot.targetIndex}-${shot.targetRole} in ${shot.shotTime} ms!`, 'color: red');
-
-    // TODO make another animation, which displays the name, ms and stays until new round (and green color if hit, red if loosing life)
     const x = this.RESPONSIVE_WIDTH * shot.relativeX;
     const y = this.RESPONSIVE_WIDTH * shot.relativeY;
     this.drawRipple(x, y);
+  }
+
+  private triggerShotNotification(shot: Shot) {
+    const name = this.players.find((p) => shot.userFireId === p.fireId).name;
+    this.shotNotification.pushShot(name, shot);
   }
 
   getScore(playerFireId: string) {
