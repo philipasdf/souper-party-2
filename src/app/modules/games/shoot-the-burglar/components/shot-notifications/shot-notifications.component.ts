@@ -46,8 +46,8 @@ export class ShotNotificationsComponent implements AfterViewInit {
   }
 
   private clearList() {
-    this.list.nativeElement.childNodes.forEach((node) => {
-      this.renderer.removeChild(this.list.nativeElement, node);
-    });
+    this.list.nativeElement.childNodes.forEach((node) =>
+      setTimeout(() => this.renderer.removeChild(this.list.nativeElement, node))
+    );
   }
 }
