@@ -9,7 +9,10 @@ ul {
 
 .correct-shot {
   color: black;
-  animation: appear 1s cubic-bezier(0, 0, 0.2, 1);
+  /* animation: appear 1s cubic-bezier(0, 0, 0.2, 1); 
+    animation doesn't look good if array always gets reinitialized 
+    should be angular-animation 
+    */
 }
 
 .first-shot {
@@ -20,14 +23,4 @@ ul {
 .wrong-shot {
   font-weight: bold;
   color: red;
-  animation: appear 1s cubic-bezier(0, 0, 0.2, 1);
-}
-
-@keyframes appear {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }

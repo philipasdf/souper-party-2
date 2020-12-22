@@ -1,6 +1,7 @@
 export interface Shot {
   id: string;
   userFireId: string;
+  userName: string;
   targetRole: 'burglar' | 'princess';
   targetIndex: number;
   timestamp: number;

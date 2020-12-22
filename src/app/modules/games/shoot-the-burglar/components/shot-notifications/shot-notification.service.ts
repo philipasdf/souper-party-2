@@ -12,13 +12,15 @@ export class ShotNotificationService {
 
   constructor() {}
 
-  pushShot(name: string, shot: Shot) {
-    if (shot.targetRole === 'princess') {
-      this.princessNotifications$.next({ name, shot });
+  pushShots(shots: Shot[]) {
+    const currRole = shots[0].targetRole;
+
+    if (currRole === 'princess') {
+      this.princessNotifications$.next(shots);
     }
 
-    if (shot.targetRole === 'burglar') {
-      this.burglarNotifications$.next({ name, shot });
+    if (currRole === 'burglar') {
+      this.burglarNotifications$.next(shots);
     }
   }
 

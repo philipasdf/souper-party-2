@@ -113,8 +113,8 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       this.revealedId = round.revealedId;
       this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
-      await timer(3000).toPromise();
-      // await timer(round.stayTime).toPromise();
+      const stayTime = this.currRole === 'burglar' ? 4000 : round.stayTime;
+      await timer(4000).toPromise();
       this.shotNotification.clearList();
       this.currRound++;
     }
@@ -140,6 +140,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
         targetIndex: this.currRound,
         timestamp: trigger.timestamp,
         userFireId: this.playerFireId,
+        userName: this.players.find((p) => p.fireId === this.playerFireId).name,
         relativeX: trigger.value.x / this.RESPONSIVE_WIDTH,
         relativeY: trigger.value.y / this.RESPONSIVE_WIDTH,
       };
@@ -164,7 +165,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
         const latestShot = sortedShots[sortedShots.length - 1];
         if (latestShot) {
           this.triggerShotAnimation(latestShot);
-          this.triggerShotNotification(latestShot);
+          this.shotNotification.pushShots(shots);
         }
       });
   }
@@ -173,11 +174,6 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     const x = this.RESPONSIVE_WIDTH * shot.relativeX;
     const y = this.RESPONSIVE_WIDTH * shot.relativeY;
     this.drawRipple(x, y);
-  }
-
-  private triggerShotNotification(shot: Shot) {
-    const name = this.players.find((p) => shot.userFireId === p.fireId).name;
-    this.shotNotification.pushShot(name, shot);
   }
 
   getScore(playerFireId: string) {
