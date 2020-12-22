@@ -65,23 +65,21 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     componentRef.onDestroy(() => this.countdownEnded$.next(true));
 
     const partyName = this.route.snapshot.params['partyName'];
-    const gameFireId = this.route.snapshot.params['gameFireId'];
+    this.gameFireId = this.route.snapshot.params['gameFireId'];
     this.playerFireId = this.route.snapshot.params['playerFireId'];
     this.store.dispatch(queryParty({ name: partyName }));
     this.store.dispatch(queryPlayers({ party: partyName }));
     this.store.dispatch(queryGames({ partyName }));
-    this.store.dispatch(queryShots({ partyName, gameFireId }));
+    this.store.dispatch(queryShots({ partyName, gameFireId: this.gameFireId }));
 
     this.store
       .select(players.selectAll)
       .pipe(takeUntil(this.unsub$))
       .subscribe((players) => (this.players = players));
 
-    const game$ = this.store.select(selectCurrGame);
-    combineLatest(game$, this.countdownEnded$)
+    combineLatest(this.store.select(selectCurrGame), this.countdownEnded$)
       .pipe(filter(([game, countdownEnded]) => !!game && !!countdownEnded))
       .subscribe(([game, _]) => {
-        this.gameFireId = `${game?.index}`;
         this.data = game?.gameData?.data;
         this.revealBurglarsAndPrincesses();
       });
@@ -96,8 +94,11 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   onClick(event: MouseEvent) {
     event.preventDefault();
-    this.triggerShot$.next(event);
-    this.drawRipple(event.clientX, event.clientY);
+
+    if (!this.isPlayerDead(this.playerFireId)) {
+      this.triggerShot$.next(event);
+      this.drawRipple(event.clientX, event.clientY);
+    }
   }
 
   async revealBurglarsAndPrincesses() {
@@ -182,6 +183,10 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   getLifepoints(playerFireId: string) {
     return this.shootTheBurglar.getLifepoints(playerFireId, this.lifepointsMap);
+  }
+
+  isPlayerDead(playerFireId: string): boolean {
+    return this.getLifepoints(playerFireId) <= 0;
   }
 
   private drawRipple(x, y) {

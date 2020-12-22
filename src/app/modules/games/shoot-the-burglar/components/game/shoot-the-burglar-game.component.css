@@ -27,3 +27,7 @@
 .relative {
   position: relative;
 }
+
+.dead {
+  color: rgb(0, 0, 0, 0.5);
+}
