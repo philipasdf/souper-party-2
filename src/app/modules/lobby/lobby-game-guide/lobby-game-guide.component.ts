@@ -3,12 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { combineLatest, Observable } from 'rxjs';
-import { filter, takeUntil, tap } from 'rxjs/operators';
+import { filter, takeUntil, tap, withLatestFrom } from 'rxjs/operators';
 import { setPartyStep } from 'src/app/shared/actions/party.actions';
 import { setPlayerStep } from 'src/app/shared/actions/player.actions';
+import { Game } from 'src/app/shared/models/game.model';
 import { Player } from 'src/app/shared/models/player.model';
 import * as games from 'src/app/shared/reducers/game.reducer';
-import { selectPartyStep } from 'src/app/shared/reducers/party.reducer';
+import { selectPartyHost, selectPartyStep } from 'src/app/shared/reducers/party.reducer';
 import * as players from 'src/app/shared/reducers/player.reducer';
 import { Step } from 'src/app/shared/steps/step';
 import { STEP_CHECK_IN_GAME, STEP_PLAY_GAME } from 'src/app/shared/steps/steps';
@@ -22,6 +23,7 @@ import { LobbyParentComponent } from '../lobby-parent/lobby-parent.component';
 export class LobbyGameGuideComponent extends LobbyParentComponent implements OnInit {
   currPlayer$: Observable<Player>;
   players$: Observable<Player[]>;
+  currGame: Game;
 
   checkedIn = false;
   gameDisplayName = '';
@@ -68,6 +70,7 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
       .pipe(takeUntil(this.unsub$))
       .subscribe((currGame) => {
         if (currGame) {
+          this.currGame = currGame;
           this.gameDisplayName = this.translate.instant(`game.${currGame.id}.name`);
           this.gameDisplayInstructions = this.translate.instant(`game.${currGame.id}.instructions`);
         }
@@ -109,20 +112,23 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
       .subscribe();
   }
 
-  /**
-   * Should only be enabled for the host, but all players will be redirected, so it's fine
-   */
   private hostStepProcessing() {
     this.players$
       .pipe(
         takeUntil(this.unsub$),
-        tap((players) => {
-          if (players.every((p) => p.step.step === STEP_CHECK_IN_GAME.step && p.step.done)) {
+        withLatestFrom(this.store.select(selectPartyHost)),
+        tap(([players, partyHost]) => {
+          const isHost = partyHost === this.getCurrPlayerName(players);
+          if (players.every((p) => p.step.step === STEP_CHECK_IN_GAME.step && p.step.done) && isHost) {
             // all players are ready for the game
             this.store.dispatch(setPartyStep({ partyName: this.partyName, step: STEP_PLAY_GAME }));
           }
         })
       )
       .subscribe();
+  }
+
+  private getCurrPlayerName(players: Player[]): string {
+    return players.find((p) => p.fireId === this.playerFireId).name;
   }
 }
