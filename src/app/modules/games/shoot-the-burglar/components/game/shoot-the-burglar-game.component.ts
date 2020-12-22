@@ -114,7 +114,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
       const stayTime = this.currRole === 'burglar' ? 4000 : round.stayTime;
-      await timer(4000).toPromise();
+      await timer(stayTime).toPromise();
       this.shotNotification.clearList();
       this.currRound++;
     }
@@ -165,7 +165,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
         const latestShot = sortedShots[sortedShots.length - 1];
         if (latestShot) {
           this.triggerShotAnimation(latestShot);
-          this.shotNotification.pushShots(shots);
+          this.shotNotification.pushShots(sortedShots);
         }
       });
   }

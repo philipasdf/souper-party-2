@@ -1,15 +1,17 @@
-<app-shot-notifications></app-shot-notifications>
-
-<app-revealed *ngIf="revealedImg" [revealedId]="revealedId" [imgName]="revealedImg" [totalWidth]="RESPONSIVE_WIDTH"></app-revealed>
 
 <div class="ripple"></div>
 
-<div *ngIf="players">
+<div *ngIf="players && data" class="relative">
     <p *ngFor="let p of players">
         {{p.name}}
         <span *ngFor="let l of [].constructor(getLifepoints(p.fireId))">💚</span>
         <span *ngFor="let l of [].constructor(getScore(p.fireId))">💀</span>
     </p>
 </div>
+<div class="relative">
+    <app-shot-notifications *ngIf="data"></app-shot-notifications>
+    <app-revealed *ngIf="revealedImg" [revealedId]="revealedId" [imgName]="revealedImg" [totalWidth]="RESPONSIVE_WIDTH"></app-revealed>
+</div>
+
 
 <img *ngFor="let i of preloadImgs" [src]="i" hidden height="0" width="0">
