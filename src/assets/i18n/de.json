@@ -25,5 +25,5 @@
     "error.player.alreadyExists": "Spieler \"{{ nickname }}\" existiert bereits in der Party \"{{ partyName }}\". Bitte gehe zurück und wähle einen anderen Nicknamen.",
     "error.player.joinPartyFailed": "Party konnte nicht beigetreten werden",
     "game.shoot-the-burglar.name": "Erschieß den Einbrecher!",
-    "game.shoot-the-burglar.instructions": "Erschieße Einbrecher, indem du auf den Bildschirm tippst. <b>Aber</b> schieß <b>nicht auf Prinzessinen</b> 😜"
+    "game.shoot-the-burglar.instructions": "Erschieße Einbrecher, indem du auf den Bildschirm tippst. <b>Aber</b> schieß <b>nicht auf Prinzessinnen</b> 😜"
 }

@@ -1,0 +1,26 @@
+ul {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 1rem;
+  z-index: 1000;
+  list-style: none;
+}
+
+.correct-shot {
+  color: black;
+  /* animation: appear 1s cubic-bezier(0, 0, 0.2, 1); 
+    animation doesn't look good if array always gets reinitialized 
+    should be angular-animation 
+    */
+}
+
+.first-shot {
+  font-weight: bold;
+  color: rgb(13, 138, 34);
+}
+
+.wrong-shot {
+  font-weight: bold;
+  color: red;
+}

@@ -1,4 +1,5 @@
 export interface RevealedConfig {
+  revealedId: string;
   role: 'burglar' | 'princess';
   src: string;
   sticker: { ratioTop: number; ratioLeft: number; ratioSize: number };
@@ -10,6 +11,7 @@ const Z_INDEX_BEHIND_STICKER = 0;
 
 export const REVEALED_CONFIGS: RevealedConfig[] = [
   {
+    revealedId: 'crown',
     role: 'princess',
     src: 'assets/images/crown.png',
     sticker: {
@@ -26,6 +28,7 @@ export const REVEALED_CONFIGS: RevealedConfig[] = [
     },
   },
   {
+    revealedId: 'princess',
     role: 'princess',
     src: 'assets/images/princess.png',
     sticker: {
@@ -42,6 +45,7 @@ export const REVEALED_CONFIGS: RevealedConfig[] = [
     },
   },
   {
+    revealedId: 'princess2',
     role: 'princess',
     src: 'assets/images/princess2.png',
     sticker: {
@@ -58,6 +62,7 @@ export const REVEALED_CONFIGS: RevealedConfig[] = [
     },
   },
   {
+    revealedId: 'burglar',
     role: 'burglar',
     src: 'assets/images/burglar.png',
     sticker: {
@@ -74,6 +79,7 @@ export const REVEALED_CONFIGS: RevealedConfig[] = [
     },
   },
   {
+    revealedId: 'burglar2',
     role: 'burglar',
     src: 'assets/images/burglar2.png',
     sticker: {
@@ -90,6 +96,7 @@ export const REVEALED_CONFIGS: RevealedConfig[] = [
     },
   },
   {
+    revealedId: 'burglar3',
     role: 'burglar',
     src: 'assets/images/burglar3.png',
     sticker: {

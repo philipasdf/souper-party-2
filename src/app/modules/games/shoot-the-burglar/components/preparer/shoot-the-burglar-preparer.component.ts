@@ -13,6 +13,7 @@ import { selectAll } from 'src/app/shared/reducers/player.reducer';
 import { GameData } from '../../../game-data';
 import { GameService } from '../../../services/game.service';
 import { ShootTheBurglarData, ShootTheBurglarReveal, ShootTheBurglarRound } from '../../shoot-the-burglar-data';
+import { REVEALED_CONFIGS } from '../revealed/revealed-configs';
 
 @Component({
   selector: 'app-shoot-the-burglar-preparer',
@@ -51,8 +52,6 @@ export class ShootTheBurglarPreparerComponent extends UnsubscribingComponent imp
         exhaustMap((players) => {
           const gameData: GameData<ShootTheBurglarData> = this.createGameData(players);
 
-          console.log(gameData);
-
           this.gameService.createGame(partyName, gameData, gameIndex);
 
           // TODO move to a better place
@@ -90,10 +89,13 @@ export class ShootTheBurglarPreparerComponent extends UnsubscribingComponent imp
   }
 
   private initRounds(numOfRounds: number, burglarsAndPrincesses: ShootTheBurglarReveal[]): ShootTheBurglarRound[] {
-    const rounds = [];
+    const rounds: ShootTheBurglarRound[] = [];
     for (let i = 0; i < numOfRounds; i++) {
+      const reveal =
+        i < burglarsAndPrincesses.length ? burglarsAndPrincesses[i] : this.getRndFromArray(burglarsAndPrincesses);
       rounds.push({
-        reveal: i < burglarsAndPrincesses.length ? burglarsAndPrincesses[i] : this.getRndReveal(burglarsAndPrincesses),
+        revealedId: this.getRandomRevealId(reveal.role),
+        reveal,
         timeUntilReveal: this.getRndTime(this.MIN_REVEAL_TIME, this.MAX_REVEAL_TIME),
         stayTime: this.getRndTime(this.MIN_STAY_TIME, this.MAX_STAY_TIME),
       });
@@ -101,8 +103,13 @@ export class ShootTheBurglarPreparerComponent extends UnsubscribingComponent imp
     return rounds;
   }
 
-  private getRndReveal(reveals: ShootTheBurglarReveal[]): ShootTheBurglarReveal {
-    return reveals[Math.floor(Math.random() * reveals.length)];
+  private getRandomRevealId(role: string): string {
+    const filteredReveals = REVEALED_CONFIGS.filter((r) => r.role === role);
+    return this.getRndFromArray(filteredReveals).revealedId;
+  }
+
+  private getRndFromArray(arr: any[]): any {
+    return arr[Math.floor(Math.random() * arr.length)];
   }
 
   private getRndTime(min: number, max: number) {

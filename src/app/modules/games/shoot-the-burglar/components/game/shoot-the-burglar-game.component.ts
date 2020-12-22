@@ -15,7 +15,8 @@ import { GameCountdownService } from '../../../game-countdown/game-countdown.ser
 import { addShot, queryShots } from '../../actions/shot.actions';
 import { Shot } from '../../models/shot.model';
 import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
-import { REVEALED_CONFIGS } from '../revealed/reavealed-configs';
+import { REVEALED_CONFIGS } from '../revealed/revealed-configs';
+import { ShotNotificationService } from '../shot-notifications/shot-notification.service';
 import { ShootTheBurglarService } from './shoot-the-burglar.service';
 
 @Component({
@@ -30,6 +31,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   playerFireId: string;
   gameFireId: string;
   data: ShootTheBurglarData;
+  RESPONSIVE_WIDTH = 0;
 
   preloadImgs = [];
   countdownEnded$ = new Subject();
@@ -38,7 +40,8 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   playerScores: { fireId: string }[] = []; // score: if you shot a burglar first, you earn one score
 
   currRound = 1;
-  revealed = '';
+  currRole = null;
+  revealedId = null;
   revealedImg = null;
   scoresMap: Map<string, number>;
   lifepointsMap: Map<string, number>;
@@ -48,12 +51,14 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     private route: ActivatedRoute,
     private store: Store,
     private countdown: GameCountdownService,
-    private shootTheBurglar: ShootTheBurglarService
+    private shootTheBurglar: ShootTheBurglarService,
+    private shotNotification: ShotNotificationService
   ) {
     super();
   }
 
   async ngOnInit() {
+    this.RESPONSIVE_WIDTH = Math.min(window.outerWidth, 500);
     this.loadAllImages();
 
     const componentRef = this.countdown.startCountdown();
@@ -89,23 +94,28 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     REVEALED_CONFIGS.forEach((r) => this.preloadImgs.push(r.src));
   }
 
-  onClick(event: Event) {
+  onClick(event: MouseEvent) {
     event.preventDefault();
-    this.triggerShot$.next();
+    this.triggerShot$.next(event);
+    this.drawRipple(event.clientX, event.clientY);
   }
 
   async revealBurglarsAndPrincesses() {
     while (this.currRound <= this.data.rounds.length) {
-      this.revealed = '';
+      this.currRole = null;
+      this.revealedId = null;
       this.revealedImg = null;
       const round = this.data.rounds[this.currRound - 1];
 
       await timer(round.timeUntilReveal).toPromise();
       this.revealedTimestamp = new Date().getTime();
-      this.revealed = round.reveal.role;
+      this.currRole = round.reveal.role;
+      this.revealedId = round.revealedId;
       this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
-      await timer(round.stayTime).toPromise();
+      const stayTime = this.currRole === 'burglar' ? 4000 : round.stayTime;
+      await timer(4000).toPromise();
+      this.shotNotification.clearList();
       this.currRound++;
     }
     this.gameOver();
@@ -122,14 +132,17 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   }
 
   private processTriggers() {
-    this.triggerShot$.pipe(timestamp()).subscribe((trigger) => {
+    this.triggerShot$.pipe(timestamp()).subscribe((trigger: { value: MouseEvent; timestamp: number }) => {
       const shot: Shot = {
         id: `${this.playerFireId}-${trigger.timestamp}`,
         shotTime: this.revealedTimestamp ? trigger.timestamp - this.revealedTimestamp : null,
-        target: this.revealed,
+        targetRole: this.currRole,
         targetIndex: this.currRound,
         timestamp: trigger.timestamp,
         userFireId: this.playerFireId,
+        userName: this.players.find((p) => p.fireId === this.playerFireId).name,
+        relativeX: trigger.value.x / this.RESPONSIVE_WIDTH,
+        relativeY: trigger.value.y / this.RESPONSIVE_WIDTH,
       };
 
       this.store.dispatch(addShot({ gameFireId: this.gameFireId, shot }));
@@ -146,14 +159,21 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       .subscribe((shots: Shot[]) => {
         this.scoresMap = this.shootTheBurglar.calculateScores(shots, this.currRound);
         this.lifepointsMap = this.shootTheBurglar.calculateLifepoints(shots, this.players);
-        this.triggerShotAnimation(shots[shots.length - 1]);
+        const sortedShots = shots
+          .filter((s) => s.targetIndex === this.currRound)
+          .sort((a, b) => a.shotTime - b.shotTime);
+        const latestShot = sortedShots[sortedShots.length - 1];
+        if (latestShot) {
+          this.triggerShotAnimation(latestShot);
+          this.shotNotification.pushShots(shots);
+        }
       });
   }
 
-  // TODO: 🔫💥 Shooting animation
   private triggerShotAnimation(shot: Shot) {
-    const name = this.players.find((p) => shot.userFireId === p.fireId).name;
-    console.log(`%c ${name} shots ${shot.targetIndex}-${shot.target} in ${shot.shotTime} ms!`, 'color: red');
+    const x = this.RESPONSIVE_WIDTH * shot.relativeX;
+    const y = this.RESPONSIVE_WIDTH * shot.relativeY;
+    this.drawRipple(x, y);
   }
 
   getScore(playerFireId: string) {
@@ -162,5 +182,14 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   getLifepoints(playerFireId: string) {
     return this.shootTheBurglar.getLifepoints(playerFireId, this.lifepointsMap);
+  }
+
+  private drawRipple(x, y) {
+    const node = document.querySelector('.ripple');
+    const newNode: any = node.cloneNode(true);
+    newNode.classList.add('animate');
+    newNode.style.left = x - 5 + 'px';
+    newNode.style.top = y - 5 + 'px';
+    node.parentNode.replaceChild(newNode, node);
   }
 }

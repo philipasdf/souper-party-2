@@ -111,6 +111,10 @@ export class AvatarCreatorComponent extends LobbyParentComponent implements OnIn
 
   async onSubmit() {
     this.isUploading = true;
+    if (!this.currPlayerAvatar) {
+      this.onCancel();
+      return;
+    }
     const uploadTask = await this.images.uploadImg(this.partyName, this.playerFireId, this.currPlayerAvatar);
     const imgUrl = await this.images.getImgURL(uploadTask.metadata.name).toPromise();
     await this.images.updateMetadata(uploadTask.metadata.name).toPromise();

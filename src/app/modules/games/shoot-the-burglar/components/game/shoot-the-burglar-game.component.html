@@ -1,4 +1,8 @@
-<app-revealed *ngIf="revealedImg" [role]="revealed" [imgName]="revealedImg"></app-revealed>
+<app-shot-notifications></app-shot-notifications>
+
+<app-revealed *ngIf="revealedImg" [revealedId]="revealedId" [imgName]="revealedImg" [totalWidth]="RESPONSIVE_WIDTH"></app-revealed>
+
+<div class="ripple"></div>
 
 <div *ngIf="players">
     <p *ngFor="let p of players">

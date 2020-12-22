@@ -14,7 +14,7 @@ export class ShootTheBurglarService {
 
     for (let i = 0; i < currRound; i++) {
       let fastestShotTime = -1;
-      const currShots = shots.filter((s) => s.targetIndex === i + 1 && s.target === 'burglar');
+      const currShots = shots.filter((s) => s.targetIndex === i + 1 && s.targetRole === 'burglar');
 
       currShots.forEach((s) => {
         if (s.shotTime < fastestShotTime || fastestShotTime === -1) {
@@ -40,13 +40,14 @@ export class ShootTheBurglarService {
   calculateLifepoints(shots: Shot[], players: Player[]): Map<string, number> {
     const lifepointsMap = new Map();
     players.forEach((p) => {
-      const princessHits = shots.filter((s) => s.target === 'princess' && s.userFireId === p.fireId).length;
+      const princessHits = shots.filter((s) => s.targetRole === 'princess' && s.userFireId === p.fireId).length;
       lifepointsMap.set(p.fireId, this.MAX_LIFEPOINTS - princessHits);
     });
     return lifepointsMap;
   }
 
   getLifepoints(playerFireId: string, lifepointsMap: Map<string, number>) {
-    return lifepointsMap?.get(playerFireId) == null ? this.MAX_LIFEPOINTS : lifepointsMap.get(playerFireId);
+    const result = lifepointsMap?.get(playerFireId) == null ? this.MAX_LIFEPOINTS : lifepointsMap.get(playerFireId);
+    return Math.max(result, 0);
   }
 }
