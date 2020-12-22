@@ -46,6 +46,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   scoresMap: Map<string, number>;
   lifepointsMap: Map<string, number>;
   revealedTimestamp: number;
+  winners = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -128,6 +129,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   private gameOver() {
     console.log('game over');
+    this.triggerWinnerAnimation();
     // update player step
     // host observes all players steps and processes further
   }
@@ -196,5 +198,9 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     newNode.style.left = x - 5 + 'px';
     newNode.style.top = y - 5 + 'px';
     node.parentNode.replaceChild(newNode, node);
+  }
+
+  private triggerWinnerAnimation() {
+    this.winners = this.shootTheBurglar.getWinners(this.players, this.scoresMap);
   }
 }

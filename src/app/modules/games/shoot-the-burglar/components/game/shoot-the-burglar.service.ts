@@ -50,4 +50,20 @@ export class ShootTheBurglarService {
     const result = lifepointsMap?.get(playerFireId) == null ? this.MAX_LIFEPOINTS : lifepointsMap.get(playerFireId);
     return Math.max(result, 0);
   }
+
+  getWinners(players: Player[], scoresMap: Map<string, number>): Player[] {
+    let highestScore = 0;
+    let winners = [];
+
+    for (const [key, value] of scoresMap.entries()) {
+      if (value > highestScore) {
+        highestScore = value;
+        winners = [key];
+      } else if (value === highestScore) {
+        winners.push(key);
+      }
+    }
+
+    return players.filter((p) => winners.includes(p.fireId));
+  }
 }

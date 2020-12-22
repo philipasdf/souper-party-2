@@ -15,3 +15,5 @@
 
 
 <img *ngFor="let i of preloadImgs" [src]="i" hidden height="0" width="0">
+
+<app-win-celebration *ngIf="winners" [winners]="winners"></app-win-celebration>
