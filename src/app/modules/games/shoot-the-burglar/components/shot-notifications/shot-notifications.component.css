@@ -12,6 +12,11 @@ ul {
   animation: appear 1s cubic-bezier(0, 0, 0.2, 1);
 }
 
+.first-shot {
+  font-weight: bold;
+  color: rgb(13, 138, 34);
+}
+
 .wrong-shot {
   font-weight: bold;
   color: red;

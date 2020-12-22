@@ -113,7 +113,9 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       this.revealedId = round.revealedId;
       this.revealedImg = this.getPlayerAvatar(round.reveal.playerFireId);
 
-      await timer(round.stayTime).toPromise();
+      await timer(3000).toPromise();
+      // await timer(round.stayTime).toPromise();
+      this.shotNotification.clearList();
       this.currRound++;
     }
     this.gameOver();
@@ -156,9 +158,14 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       .subscribe((shots: Shot[]) => {
         this.scoresMap = this.shootTheBurglar.calculateScores(shots, this.currRound);
         this.lifepointsMap = this.shootTheBurglar.calculateLifepoints(shots, this.players);
-        const latestShot = shots[shots.length - 1];
-        this.triggerShotAnimation(latestShot);
-        this.triggerShotNotification(latestShot);
+        const sortedShots = shots
+          .filter((s) => s.targetIndex === this.currRound)
+          .sort((a, b) => a.shotTime - b.shotTime);
+        const latestShot = sortedShots[sortedShots.length - 1];
+        if (latestShot) {
+          this.triggerShotAnimation(latestShot);
+          this.triggerShotNotification(latestShot);
+        }
       });
   }
 

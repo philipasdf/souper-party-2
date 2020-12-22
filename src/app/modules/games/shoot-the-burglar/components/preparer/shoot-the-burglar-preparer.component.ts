@@ -52,8 +52,6 @@ export class ShootTheBurglarPreparerComponent extends UnsubscribingComponent imp
         exhaustMap((players) => {
           const gameData: GameData<ShootTheBurglarData> = this.createGameData(players);
 
-          console.log(gameData);
-
           this.gameService.createGame(partyName, gameData, gameIndex);
 
           // TODO move to a better place

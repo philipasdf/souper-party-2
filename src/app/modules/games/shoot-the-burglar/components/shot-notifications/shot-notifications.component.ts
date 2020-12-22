@@ -29,13 +29,14 @@ export class ShotNotificationsComponent implements AfterViewInit {
   }
 
   private appendBurglarElement(name: string, shot: Shot) {
-    /*
-    if first, then green and win animation...oooor just let the list and make a "score +1" animation
-    then color green the quickest
-    => with css:first
-  */
     const text = `${name} ${shot.shotTime}ms`;
-    this.appendListElement(text, 'correct-shot');
+    let classes = 'correct-shot';
+
+    if (this.list.nativeElement.childNodes.length === 0) {
+      classes += ' first-shot';
+    }
+
+    this.appendListElement(text, classes);
   }
 
   private appendListElement(text: string, classes: string) {
