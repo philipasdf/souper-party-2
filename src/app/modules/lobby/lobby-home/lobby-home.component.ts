@@ -47,10 +47,10 @@ export class LobbyHomeComponent extends LobbyParentComponent implements OnInit {
     this.store
       .select(selectCurrGameIndex)
       .pipe(takeUntil(this.unsub$))
-      .subscribe((currGameIndex) => {
+      .subscribe((currGameIndex: number) => {
         let gameIndex: number = 0;
         if (currGameIndex) {
-          gameIndex = currGameIndex + 1;
+          gameIndex = parseInt(`${currGameIndex}`, 10) + 1; // Problem 0 + 1 = 01 somehow
         }
         this.gameService.loadGamePreparer(this.partyName, this.playerFireId, 'shoot-the-burglar', gameIndex);
       });

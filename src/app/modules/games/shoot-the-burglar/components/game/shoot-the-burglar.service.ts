@@ -39,7 +39,7 @@ export class ShootTheBurglarService {
 
   calculateLifepoints(shots: Shot[], players?: Player[]): Map<string, number> {
     const lifepointsMap = new Map();
-    players.forEach((p) => {
+    players?.forEach((p) => {
       const princessHits = shots.filter((s) => s.targetRole === 'princess' && s.userFireId === p.fireId).length;
       lifepointsMap.set(p.fireId, this.MAX_LIFEPOINTS - princessHits);
     });
