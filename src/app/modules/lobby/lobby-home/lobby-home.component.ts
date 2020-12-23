@@ -5,14 +5,14 @@ import { combineLatest, Observable } from 'rxjs';
 import { filter, map, takeUntil, tap } from 'rxjs/operators';
 import { setPlayerStep } from 'src/app/shared/actions/player.actions';
 import { Player } from 'src/app/shared/models/player.model';
-import { selectPartyStep, selectPartyHost } from 'src/app/shared/reducers/party.reducer';
+import { selectPartyStep, selectPartyHost, selectCurrGameIndex } from 'src/app/shared/reducers/party.reducer';
 import {
   selectAll,
   selectCurrPlayer,
   selectCurrPlayerName,
   selectCurrPlayerStep,
 } from 'src/app/shared/reducers/player.reducer';
-import { STEP_CHECK_IN_GAME } from 'src/app/shared/steps/steps';
+import { IDLE, STEP_CHECK_IN_GAME } from 'src/app/shared/steps/steps';
 import { GameService } from '../../games/services/game.service';
 import { LobbyParentComponent } from '../lobby-parent/lobby-parent.component';
 
@@ -44,8 +44,16 @@ export class LobbyHomeComponent extends LobbyParentComponent implements OnInit {
   }
 
   onStartGame() {
-    const gameIndex = 0; // TODO games.length oder so
-    this.gameService.loadGamePreparer(this.partyName, this.playerFireId, 'shoot-the-burglar', gameIndex);
+    this.store
+      .select(selectCurrGameIndex)
+      .pipe(takeUntil(this.unsub$))
+      .subscribe((currGameIndex) => {
+        let gameIndex: number = 0;
+        if (currGameIndex) {
+          gameIndex = currGameIndex + 1;
+        }
+        this.gameService.loadGamePreparer(this.partyName, this.playerFireId, 'shoot-the-burglar', gameIndex);
+      });
   }
 
   private initDisplayData() {
@@ -62,8 +70,11 @@ export class LobbyHomeComponent extends LobbyParentComponent implements OnInit {
         takeUntil(this.unsub$),
         filter(([player, partyStep]) => !!player && !!partyStep),
         map(([player, partyStep]) => {
-          if (player.step.step !== partyStep.step) {
-            this.store.dispatch(setPlayerStep({ player: player, step: partyStep }));
+          if (partyStep.step === IDLE.step && player.step.step !== IDLE.step) {
+            this.store.dispatch(setPlayerStep({ player: player, step: IDLE }));
+          }
+          if (partyStep.step === STEP_CHECK_IN_GAME.step && player.step.step !== STEP_CHECK_IN_GAME.step) {
+            this.store.dispatch(setPlayerStep({ player: player, step: STEP_CHECK_IN_GAME }));
           }
         })
       )

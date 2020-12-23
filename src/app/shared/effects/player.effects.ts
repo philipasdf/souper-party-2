@@ -114,7 +114,7 @@ export class PlayerEffects {
       this.playerFs.setStep(partyName, action.player.name, action.step)
     ),
     map(() => {
-      console.log('%c SERVICE: setStep success', 'color: green');
+      // console.log('%c SERVICE: setStep success', 'color: green');
       return { type: SET_PLAYER_STEP_SUCCESS };
     }),
     catchError((err) => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateStepFailed') }))

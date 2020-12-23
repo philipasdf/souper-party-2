@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { combineLatest, Subject, timer } from 'rxjs';
-import { filter, takeUntil, timestamp } from 'rxjs/operators';
+import { combineLatest, Observable, Subject, timer } from 'rxjs';
+import { filter, takeUntil, tap, timestamp, withLatestFrom } from 'rxjs/operators';
 import * as shots from 'src/app/modules/games/shoot-the-burglar/reducers/shot.reducer';
 import { queryGames } from 'src/app/shared/actions/game.actions';
-import { queryParty } from 'src/app/shared/actions/party.actions';
-import { queryPlayers } from 'src/app/shared/actions/player.actions';
+import { queryParty, setPartyStep } from 'src/app/shared/actions/party.actions';
+import { queryPlayers, setPlayerStep } from 'src/app/shared/actions/player.actions';
 import { UnsubscribingComponent } from 'src/app/shared/components/unsubscribing/unsubscribing.component';
 import { Player } from 'src/app/shared/models/player.model';
 import { selectCurrGame } from 'src/app/shared/reducers/game.reducer';
@@ -18,6 +18,8 @@ import { ShootTheBurglarData } from '../../shoot-the-burglar-data';
 import { REVEALED_CONFIGS } from '../revealed/revealed-configs';
 import { ShotNotificationService } from '../shot-notifications/shot-notification.service';
 import { ShootTheBurglarService } from './shoot-the-burglar.service';
+import { IDLE, GAME_OVER } from 'src/app/shared/steps/steps';
+import { selectPartyHost } from 'src/app/shared/reducers/party.reducer';
 
 @Component({
   selector: 'app-shoot-the-burglar-game',
@@ -28,6 +30,7 @@ import { ShootTheBurglarService } from './shoot-the-burglar.service';
   },
 })
 export class ShootTheBurglarGameComponent extends UnsubscribingComponent implements OnInit {
+  partyName: string;
   playerFireId: string;
   gameFireId: string;
   data: ShootTheBurglarData;
@@ -36,6 +39,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   preloadImgs = [];
   countdownEnded$ = new Subject();
   triggerShot$ = new Subject();
+  players$: Observable<Player[]>;
   players: Player[];
   playerScores: { fireId: string }[] = []; // score: if you shot a burglar first, you earn one score
 
@@ -50,6 +54,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private store: Store,
     private countdown: GameCountdownService,
     private shootTheBurglar: ShootTheBurglarService,
@@ -65,18 +70,18 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     const componentRef = this.countdown.startCountdown();
     componentRef.onDestroy(() => this.countdownEnded$.next(true));
 
-    const partyName = this.route.snapshot.params['partyName'];
+    this.partyName = this.route.snapshot.params['partyName'];
     this.gameFireId = this.route.snapshot.params['gameFireId'];
     this.playerFireId = this.route.snapshot.params['playerFireId'];
-    this.store.dispatch(queryParty({ name: partyName }));
-    this.store.dispatch(queryPlayers({ party: partyName }));
-    this.store.dispatch(queryGames({ partyName }));
-    this.store.dispatch(queryShots({ partyName, gameFireId: this.gameFireId }));
+    this.store.dispatch(queryParty({ name: this.partyName }));
+    this.store.dispatch(queryPlayers({ party: this.partyName }));
+    this.store.dispatch(queryGames({ partyName: this.partyName }));
+    this.store.dispatch(queryShots({ partyName: this.partyName, gameFireId: this.gameFireId }));
 
-    this.store
-      .select(players.selectAll)
-      .pipe(takeUntil(this.unsub$))
-      .subscribe((players) => (this.players = players));
+    this.players$ = this.store.select(players.selectAll).pipe(
+      takeUntil(this.unsub$),
+      tap((players) => (this.players = players))
+    );
 
     combineLatest(this.store.select(selectCurrGame), this.countdownEnded$)
       .pipe(filter(([game, countdownEnded]) => !!game && !!countdownEnded))
@@ -87,6 +92,8 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
     this.processTriggers();
     this.processShots();
+
+    this.hostStepProcessing();
   }
 
   private loadAllImages() {
@@ -123,17 +130,6 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
     this.gameOver();
   }
 
-  private getPlayerAvatar(fireId: string): string {
-    return this.players.find((p) => p.fireId === fireId).avatarUrl;
-  }
-
-  private gameOver() {
-    console.log('game over');
-    this.triggerWinnerAnimation();
-    // update player step
-    // host observes all players steps and processes further
-  }
-
   private processTriggers() {
     this.triggerShot$.pipe(timestamp()).subscribe((trigger: { value: MouseEvent; timestamp: number }) => {
       const shot: Shot = {
@@ -143,7 +139,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
         targetIndex: this.currRound,
         timestamp: trigger.timestamp,
         userFireId: this.playerFireId,
-        userName: this.players.find((p) => p.fireId === this.playerFireId).name,
+        userName: this.getPlayer(this.playerFireId).name,
         relativeX: trigger.value.x / this.RESPONSIVE_WIDTH,
         relativeY: trigger.value.y / this.RESPONSIVE_WIDTH,
       };
@@ -162,13 +158,11 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
       .subscribe((shots: Shot[]) => {
         this.scoresMap = this.shootTheBurglar.calculateScores(shots, this.currRound);
         this.lifepointsMap = this.shootTheBurglar.calculateLifepoints(shots, this.players);
-        const sortedShots = shots
-          .filter((s) => s.targetIndex === this.currRound)
-          .sort((a, b) => a.shotTime - b.shotTime);
-        const latestShot = sortedShots[sortedShots.length - 1];
+        const currShots = this.shootTheBurglar.getCurrShots(shots, this.currRound);
+        const latestShot = currShots[currShots.length - 1];
         if (latestShot) {
           this.triggerShotAnimation(latestShot);
-          this.shotNotification.pushShots(sortedShots);
+          this.shotNotification.pushShots(currShots);
         }
       });
   }
@@ -202,5 +196,46 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
 
   private triggerWinnerAnimation() {
     this.winners = this.shootTheBurglar.getWinners(this.players, this.scoresMap);
+  }
+
+  private getPlayerAvatar(fireId: string): string {
+    return this.getPlayer(fireId).avatarUrl;
+  }
+
+  private getPlayer(fireId: string): Player {
+    return this.players.find((p) => p.fireId === fireId);
+  }
+
+  private gameOver() {
+    this.triggerWinnerAnimation();
+    timer(5000)
+      .toPromise()
+      .then(() => {
+        const player = this.getPlayer(this.playerFireId);
+        this.store.dispatch(setPlayerStep({ player, step: GAME_OVER }));
+      });
+  }
+
+  private hostStepProcessing() {
+    this.players$
+      .pipe(
+        takeUntil(this.unsub$),
+        filter((players) => !!players && players.length > 0),
+        withLatestFrom(this.store.select(selectPartyHost)),
+        tap(([players, partyHost]) => {
+          // all players have ended the game
+          if (players.every((p) => p.step.step === GAME_OVER.step)) {
+            // host sets step and updates score
+            const currPlayerName = this.getPlayer(this.playerFireId).name;
+            const isHost = partyHost === currPlayerName;
+            if (isHost) {
+              // this.winners set score
+              this.store.dispatch(setPartyStep({ partyName: this.partyName, step: IDLE }));
+            }
+            this.router.navigate([`lobby/${this.partyName}/${this.playerFireId}`]);
+          }
+        })
+      )
+      .subscribe();
   }
 }
