@@ -25,7 +25,8 @@
               "src/manifest.webmanifest"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "src/assets/font/source-sans-pro-v14-latin/source-sans-pro.css"
             ],
             "scripts": []
           },
