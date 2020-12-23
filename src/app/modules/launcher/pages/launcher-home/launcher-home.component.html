@@ -1,12 +1,8 @@
-
-
-
-
-
-
-<h1>Souper Party</h1>
-
-<label>{{ 'launcher.home.label' | translate }}</label>
-<input type="text" maxlength="8" [placeholder]="'launcher.home.placeholder' | translate" [(ngModel)]="nameInput">
-
-<button routerLink="createorjoin" (click)="saveUser()" [disabled]="nameInput.trim().length === 0">{{ 'common.next' | translate }}</button>
+<div class="padding-1">
+    <h1>Souper Party</h1>
+    
+    <label>{{ 'launcher.home.label' | translate }}</label>
+    <input type="text" maxlength="8" [placeholder]="'launcher.home.placeholder' | translate" [(ngModel)]="nameInput">
+    
+    <button routerLink="createorjoin" (click)="saveUser()" [disabled]="nameInput.trim().length === 0">{{ 'common.next' | translate }}</button>
+</div>

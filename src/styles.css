@@ -1,6 +1,30 @@
+:root {
+  --main-color: #6c1e00;
+}
+
 body {
   margin: 0;
   font-family: 'Source Sans Pro';
+}
+
+input {
+  padding: 0.25rem;
+  margin: 1rem;
+}
+
+button {
+  padding: 0.4rem;
+  width: 5rem;
+  font-weight: bold;
+  color: white;
+  background: var(--main-color);
+  border: none;
+  border-radius: 1px;
+  margin-right: 0.5rem;
+}
+
+h1 {
+  color: var(--main-color);
 }
 
 .error {
@@ -10,4 +34,8 @@ body {
 .clip-ellipse {
   clip-path: ellipse(50% 50% at center);
   -webkit-clip-path: ellipse(50% 50% at center);
+}
+
+.padding-1 {
+  padding: 1rem;
 }
