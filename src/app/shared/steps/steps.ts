@@ -19,7 +19,7 @@ export const STEP_PLAY_GAME: Step = {
   done: false,
 };
 
-export const STEP_DECLINE_WINNER: Step = {
-  step: 'decline-winner',
+export const GAME_OVER: Step = {
+  step: 'game-over',
   done: false,
 };

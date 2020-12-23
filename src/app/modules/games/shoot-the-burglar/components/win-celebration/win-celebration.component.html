@@ -1,0 +1,14 @@
+<div class="winner-celebration winner-animation">
+    <div class="center">
+        <div *ngIf="winners.length > 0">
+            <h1 class="textcolor">Glückwunsch!</h1>
+            <div class="avatars">
+                <img *ngFor="let w of winners" class="clip-ellipse" [src]="w.avatarUrl">
+            </div>
+        </div>
+
+        <div *ngIf="winners.length <= 0">
+            <h1 class="no-winner-title">Unentschieden</h1>
+        </div>
+    </div>
+</div>

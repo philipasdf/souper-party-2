@@ -37,9 +37,9 @@ export class ShootTheBurglarService {
     return scoresMap?.get(playerFireId) == null ? 0 : scoresMap.get(playerFireId);
   }
 
-  calculateLifepoints(shots: Shot[], players: Player[]): Map<string, number> {
+  calculateLifepoints(shots: Shot[], players?: Player[]): Map<string, number> {
     const lifepointsMap = new Map();
-    players.forEach((p) => {
+    players?.forEach((p) => {
       const princessHits = shots.filter((s) => s.targetRole === 'princess' && s.userFireId === p.fireId).length;
       lifepointsMap.set(p.fireId, this.MAX_LIFEPOINTS - princessHits);
     });
@@ -49,5 +49,28 @@ export class ShootTheBurglarService {
   getLifepoints(playerFireId: string, lifepointsMap: Map<string, number>) {
     const result = lifepointsMap?.get(playerFireId) == null ? this.MAX_LIFEPOINTS : lifepointsMap.get(playerFireId);
     return Math.max(result, 0);
+  }
+
+  getWinners(players: Player[], scoresMap: Map<string, number>): Player[] {
+    if (!scoresMap) {
+      return [];
+    }
+    let highestScore = 0;
+    let winners = [];
+
+    for (const [key, value] of scoresMap.entries()) {
+      if (value > highestScore) {
+        highestScore = value;
+        winners = [key];
+      } else if (value === highestScore) {
+        winners.push(key);
+      }
+    }
+
+    return players.filter((p) => winners.includes(p.fireId));
+  }
+
+  getCurrShots(shots: Shot[], currRound: number): Shot[] {
+    return shots.filter((s) => s.targetIndex === currRound).sort((a, b) => a.shotTime - b.shotTime);
   }
 }

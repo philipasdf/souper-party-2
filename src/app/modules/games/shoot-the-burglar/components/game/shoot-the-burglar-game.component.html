@@ -2,7 +2,7 @@
 <div class="ripple"></div>
 
 <div *ngIf="players && data" class="relative">
-    <p *ngFor="let p of players">
+    <p *ngFor="let p of players" [ngClass]="{'dead': isPlayerDead(p.fireId)}">
         {{p.name}}
         <span *ngFor="let l of [].constructor(getLifepoints(p.fireId))">💚</span>
         <span *ngFor="let l of [].constructor(getScore(p.fireId))">💀</span>
@@ -15,3 +15,5 @@
 
 
 <img *ngFor="let i of preloadImgs" [src]="i" hidden height="0" width="0">
+
+<app-win-celebration *ngIf="winners" [winners]="winners"></app-win-celebration>

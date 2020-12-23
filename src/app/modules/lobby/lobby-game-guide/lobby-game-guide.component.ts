@@ -22,6 +22,7 @@ import { LobbyParentComponent } from '../lobby-parent/lobby-parent.component';
 })
 export class LobbyGameGuideComponent extends LobbyParentComponent implements OnInit {
   currPlayer$: Observable<Player>;
+  currPlayer: Player;
   players$: Observable<Player[]>;
   currGame: Game;
 
@@ -41,9 +42,14 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
   ngOnInit(): void {
     super.ngOnInit();
 
-    this.currPlayer$ = this.store.select(players.selectCurrPlayer, {
-      playerFireId: this.playerFireId,
-    });
+    this.currPlayer$ = this.store
+      .select(players.selectCurrPlayer, {
+        playerFireId: this.playerFireId,
+      })
+      .pipe(
+        takeUntil(this.unsub$),
+        tap((currPlayer) => (this.currPlayer = currPlayer))
+      );
     this.players$ = this.store.select(players.selectAll);
 
     this.initDisplayData();
@@ -57,7 +63,7 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
       step: STEP_CHECK_IN_GAME.step,
       done: true,
     };
-    this.currPlayer$.subscribe((currPlayer) => this.store.dispatch(setPlayerStep({ player: currPlayer, step })));
+    this.store.dispatch(setPlayerStep({ player: this.currPlayer, step }));
   }
 
   isPlayerReadyForTheGame(player: Player) {
@@ -71,8 +77,8 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
       .subscribe((currGame) => {
         if (currGame) {
           this.currGame = currGame;
-          this.gameDisplayName = this.translate.instant(`game.${currGame.id}.name`);
-          this.gameDisplayInstructions = this.translate.instant(`game.${currGame.id}.instructions`);
+          this.gameDisplayName = this.translate.instant(`game.${currGame.name}.name`);
+          this.gameDisplayInstructions = this.translate.instant(`game.${currGame.name}.instructions`);
         }
       });
   }
@@ -91,7 +97,7 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
             this.checkedIn = playerStep.done;
           }
           if (playerStep.step === STEP_PLAY_GAME.step && !playerStep.done) {
-            this.router.navigate([`/${currGame.id}/${this.partyName}/${currGame.index}/${this.playerFireId}`]);
+            this.router.navigate([`/${currGame.name}/${this.partyName}/${currGame.index}/${this.playerFireId}`]);
           }
         })
       )
@@ -116,6 +122,7 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
     this.players$
       .pipe(
         takeUntil(this.unsub$),
+        filter((players) => !!players && players.length > 0),
         withLatestFrom(this.store.select(selectPartyHost)),
         tap(([players, partyHost]) => {
           const isHost = partyHost === this.getCurrPlayerName(players);

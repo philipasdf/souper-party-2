@@ -23,6 +23,8 @@ import {
   FAILED,
   SET_PLAYER_AVATAR,
   SetPlayerAvatar,
+  INCREMENT_PLAYER_POINTS,
+  IncrementPlayerPoints,
 } from '../actions/player.actions';
 import { PlayerFsService } from '../firestore-services/player-fs.service';
 import { CURR_PLAYER_KEY } from '../local-storage-keys';
@@ -114,7 +116,7 @@ export class PlayerEffects {
       this.playerFs.setStep(partyName, action.player.name, action.step)
     ),
     map(() => {
-      console.log('%c SERVICE: setStep success', 'color: green');
+      // console.log('%c SERVICE: setStep success', 'color: green');
       return { type: SET_PLAYER_STEP_SUCCESS };
     }),
     catchError((err) => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateStepFailed') }))
@@ -129,5 +131,16 @@ export class PlayerEffects {
     }),
     map(() => ({ type: SUCCESS })),
     catchError((err) => of({ type: FAILED, errorMessage: this.translate.instant('error.player.updateAvatarFailed') }))
+  );
+
+  @Effect()
+  incrementPlayerPoints$ = this.actions$.pipe(
+    ofType(INCREMENT_PLAYER_POINTS),
+    withLatestFrom(this.store.select(selectPartyName)),
+    switchMap(([action, partyName]: [IncrementPlayerPoints, string]) => {
+      return this.playerFs.incrementPoints(partyName, action.player);
+    }),
+    map(() => ({ type: SUCCESS })),
+    catchError((err) => of({ type: FAILED, errorMessage: 'failed to increment player points' }))
   );
 }

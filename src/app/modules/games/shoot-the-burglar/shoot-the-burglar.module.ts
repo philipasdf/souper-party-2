@@ -9,6 +9,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { ShotEffects } from './effects/shot.effects';
 import { RevealedComponent } from './components/revealed/revealed.component';
 import { ShotNotificationsComponent } from './components/shot-notifications/shot-notifications.component';
+import { WinCelebrationComponent } from './components/win-celebration/win-celebration.component';
 
 @NgModule({
   imports: [
@@ -17,6 +18,6 @@ import { ShotNotificationsComponent } from './components/shot-notifications/shot
     StoreModule.forFeature('shot', shotReducer),
     EffectsModule.forFeature([ShotEffects]),
   ],
-  declarations: [ShootTheBurglarPreparerComponent, ShootTheBurglarGameComponent, RevealedComponent, ShotNotificationsComponent],
+  declarations: [ShootTheBurglarPreparerComponent, ShootTheBurglarGameComponent, RevealedComponent, ShotNotificationsComponent, WinCelebrationComponent],
 })
 export class ShootTheBurglar {}

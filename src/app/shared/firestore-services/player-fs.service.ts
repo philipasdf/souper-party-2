@@ -10,7 +10,7 @@ export class PlayerFsService {
   constructor(private afs: AngularFirestore) {}
 
   checkIfPlayerExists(partyName: string, playerName: string) {
-    return this.afs.doc(`${PARTY_PATH}/${partyName}/${PLAYER_PATH}/${playerName}`).get();
+    return this.getPlayerRef(partyName, playerName).get();
   }
 
   createPlayer(partyName: string, player: Player) {
@@ -22,13 +22,23 @@ export class PlayerFsService {
   }
 
   setStep(partyName: string, playerName: string, step: Step) {
-    console.log(`%c SERVICE: setStep -> ${step.step} -> ${step.done}`, 'color: green');
-    const ref = this.afs.doc<Player>(`${PARTY_PATH}/${partyName}/${PLAYER_PATH}/${playerName}`);
+    // console.log(`%c SERVICE: setStep -> ${playerName} -> ${step.step} -> ${step.done}`, 'color: green');
+    const ref = this.getPlayerRef(partyName, playerName);
     return from(ref.update({ step }));
   }
 
   setAvatar(partyName: string, playerName: string, avatar: string, avatarUrl: string) {
-    const ref = this.afs.doc<Player>(`${PARTY_PATH}/${partyName}/${PLAYER_PATH}/${playerName}`);
+    const ref = this.getPlayerRef(partyName, playerName);
     return from(ref.update({ avatar, avatarUrl }));
+  }
+
+  incrementPoints(partyName: string, player: Player) {
+    const ref = this.getPlayerRef(partyName, player.name);
+    const points = player.points + 1;
+    return from(ref.update({ points }));
+  }
+
+  private getPlayerRef(partyName: string, playerName: string) {
+    return this.afs.doc<Player>(`${PARTY_PATH}/${partyName}/${PLAYER_PATH}/${playerName}`);
   }
 }
