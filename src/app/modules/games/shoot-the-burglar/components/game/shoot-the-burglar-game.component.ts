@@ -6,7 +6,7 @@ import { filter, takeUntil, tap, timestamp, withLatestFrom } from 'rxjs/operator
 import * as shots from 'src/app/modules/games/shoot-the-burglar/reducers/shot.reducer';
 import { queryGames } from 'src/app/shared/actions/game.actions';
 import { queryParty, setPartyStep } from 'src/app/shared/actions/party.actions';
-import { queryPlayers, setPlayerStep } from 'src/app/shared/actions/player.actions';
+import { incrementPlayerPoints, queryPlayers, setPlayerStep } from 'src/app/shared/actions/player.actions';
 import { UnsubscribingComponent } from 'src/app/shared/components/unsubscribing/unsubscribing.component';
 import { Player } from 'src/app/shared/models/player.model';
 import { selectCurrGame } from 'src/app/shared/reducers/game.reducer';
@@ -50,7 +50,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
   scoresMap: Map<string, number>;
   lifepointsMap: Map<string, number>;
   revealedTimestamp: number;
-  winners = null;
+  winners: Player[] = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -229,7 +229,7 @@ export class ShootTheBurglarGameComponent extends UnsubscribingComponent impleme
             const currPlayerName = this.getPlayer(this.playerFireId).name;
             const isHost = partyHost === currPlayerName;
             if (isHost) {
-              // this.winners set score
+              this.winners.forEach((w) => this.store.dispatch(incrementPlayerPoints({ player: w })));
               this.store.dispatch(setPartyStep({ partyName: this.partyName, step: IDLE }));
             }
             this.router.navigate([`lobby/${this.partyName}/${this.playerFireId}`]);

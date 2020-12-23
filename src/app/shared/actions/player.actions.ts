@@ -42,6 +42,10 @@ export const SET_PLAYER_AVATAR = `${PLAYER_TAG} set avatar`;
 export const setPlayerAvatar = createAction(SET_PLAYER_AVATAR, props<{ avatar: string; avatarUrl: string }>());
 export type SetPlayerAvatar = ReturnType<typeof setPlayerAvatar>;
 
+export const INCREMENT_PLAYER_POINTS = `${PLAYER_TAG} increment player points`;
+export const incrementPlayerPoints = createAction(INCREMENT_PLAYER_POINTS, props<{ player: Player }>());
+export type IncrementPlayerPoints = ReturnType<typeof incrementPlayerPoints>;
+
 /**
  * Step (=States) (maybe more than one action?)
  */
