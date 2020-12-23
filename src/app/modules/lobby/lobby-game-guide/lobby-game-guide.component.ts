@@ -71,8 +71,8 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
       .subscribe((currGame) => {
         if (currGame) {
           this.currGame = currGame;
-          this.gameDisplayName = this.translate.instant(`game.${currGame.id}.name`);
-          this.gameDisplayInstructions = this.translate.instant(`game.${currGame.id}.instructions`);
+          this.gameDisplayName = this.translate.instant(`game.${currGame.name}.name`);
+          this.gameDisplayInstructions = this.translate.instant(`game.${currGame.name}.instructions`);
         }
       });
   }
@@ -91,7 +91,7 @@ export class LobbyGameGuideComponent extends LobbyParentComponent implements OnI
             this.checkedIn = playerStep.done;
           }
           if (playerStep.step === STEP_PLAY_GAME.step && !playerStep.done) {
-            this.router.navigate([`/${currGame.id}/${this.partyName}/${currGame.index}/${this.playerFireId}`]);
+            this.router.navigate([`/${currGame.name}/${this.partyName}/${currGame.index}/${this.playerFireId}`]);
           }
         })
       )

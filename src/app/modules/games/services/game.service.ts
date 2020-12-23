@@ -15,7 +15,8 @@ export class GameService {
 
   createGame(partyName: string, gameData: GameData<any>, index: number) {
     const game: Game = {
-      id: gameData.name,
+      id: `${index}`, // !! id must be unique
+      name: gameData.name,
       index: index,
       state: 'initial-state',
       gameData: gameData,
