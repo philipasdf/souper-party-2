@@ -29,13 +29,20 @@
   place-items: center;
 }
 
-.textcolor {
+h1 {
   text-align: center;
   text-transform: uppercase;
+}
+
+.textcolor {
   background: linear-gradient(to right, #5dd030 0%, #186708 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+.no-winner-title {
+  color: gray;
 }
 
 .avatars {
